@@ -125,6 +125,8 @@ class Bezier():
             (xi,yi) = point.get()
             point.set(x=xi+x*blend_function, y=yi+y*blend_function)
             k += 1
+        (xi,yi) = point.get()
+        point.set(x=int(round(xi,0)), y=int(round(yi,0)))
         return point 
     
     def print_points(self):
@@ -156,7 +158,7 @@ class TestBezier(unittest.TestCase):
         p3 = Point().set(x=3, y=1)
         self.b.points = [p1,p2,p3]
         self.b.set_coeffs()
-        self.assertEqual(self.b.coeffs,[1,3,3,1])
+        self.assertEqual(self.b.coeffs,[1,2,1])
 
     def test_get_point(self):
         p1 = Point()
@@ -172,19 +174,29 @@ class TestBezier(unittest.TestCase):
         p2 = self.b.get_point(0.5)
         p3 = self.b.get_point(0.75)
         p4 = self.b.get_point(1.0)
-        self.assertEqual(p0.get(),(1.0,1.0))
-        self.assertEqual(p1.get(),(1.875,1.75))
-        self.assertEqual(p2.get(),(2.5,2.0))
-        self.assertEqual(p3.get(),(2.875,1.75))
-        self.assertEqual(p4.get(),(3.0,1.0))
+        self.assertEqual(p0.get(),(1,1))
+        self.assertEqual(p1.get(),(2,2))
+        self.assertEqual(p2.get(),(3,2.0))
+        self.assertEqual(p3.get(),(3,2))
+        self.assertEqual(p4.get(),(3,1))
 
 class Equation():
     def __init__(self):
         self.bezier = Bezier()
         self.u = 0
         self.step = 0
-        self.tol = 10
+        self.tol = 4
         self.done = False
+
+    def in_range(self,p,p2):
+        r = False
+        if p < p2:
+            if p2 + self.tol >= p:
+                r = True
+        elif p > p2:
+            if p2-self.tol <= p:
+                r = True
+        return r
 
     def set_equation(self,p1,p2):
         '''
@@ -199,13 +211,19 @@ class Equation():
         (x2,y2) = p2.get()
         dx = math.fabs(x1 - x2)
         dy = math.fabs(y1 - y2)
-        euclidean = math.sqrt(dx*dx+dy*dy)
-        if (dx < self.tol and dx < dy/2):
+        euclidean = int(math.sqrt(dx*dx+dy*dy))
+        if (dx < euclidean/2 and not self.in_range(dx, dy)):
             mid_y = (y1+y2) / 2
             mid_x = min(x1,x2) + euclidean
-        else:
+        elif (dy < euclidean/2 and not self.in_range(dy, dx)):
             mid_x = (x1 + x2) / 2
-            mid_y = min(y1,y2) + euclidean
+            mid_y = max(y1,y2) + euclidean
+        elif dy < euclidean/2 and dx < euclidean/2:
+            mid_x = min(x1,x2) + int(euclidean/2)
+            mid_y = max(y1,y2) + int(euclidean/2)
+        else:
+            mid_x = min(x1,x2) + int(euclidean/4)
+            mid_y = max(y1,y2) + int(euclidean/4)
         #set the the step size
         self.step = 1 / float(euclidean)
         # add the three points
@@ -258,14 +276,14 @@ class TestEquation(unittest.TestCase):
         self.assertEqual(self.e.step, 0.5)
         points = self.e.bezier.points
         self.assertEqual(points[0].get(),(1,1))
-        self.assertEqual(points[1].get(),(2,3.0))
+        self.assertEqual(points[1].get(),(1,1))
         self.assertEqual(points[2].get(),(3,1))
         self.assertEqual(self.e.get().get(), (1.0,1.0))
-        self.assertEqual(self.e.get().get(), (2.0,2.0))
+        self.assertEqual(self.e.get().get(), (2,1))
         self.assertEqual(self.e.get().get(), (3.0,1.0))
         self.assertEqual(self.e.is_done(),True)
     
-    def test_simple_set_equation(self):
+    def test_set_equation(self):
         p = Point()
         p.set(x=1,y=1)
         p2 = Point()
@@ -274,13 +292,61 @@ class TestEquation(unittest.TestCase):
         self.assertEqual(self.e.step, 0.5)
         points = self.e.bezier.points
         self.assertEqual(points[0].get(),(1,1))
-        self.assertEqual(points[1].get(),(2,3.0))
+        self.assertEqual(points[1].get(),(1,1))
         self.assertEqual(points[2].get(),(3,1))
-        self.assertEqual(self.e.get().get(), (1.0,1.0))
-        self.assertEqual(self.e.get().get(), (2.0,2.0))
-        self.assertEqual(self.e.get().get(), (3.0,1.0))
+        self.assertEqual(self.e.get().get(), (1,1))
+        self.assertEqual(self.e.get().get(), (2,1))
+        self.assertEqual(self.e.get().get(), (3,1))
+        self.assertEqual(self.e.is_done(),True)
+
+    def test_2_set_equation(self):
+        p = Point()
+        p.set(x=0,y=0)
+        p2 = Point()
+        p2.set(x=3,y=10)
+        self.e.set_equation(p, p2)
+        self.assertEqual(self.e.step, 0.1)
+        points = self.e.bezier.points
+        self.assertEqual(points[0].get(),(0,0))
+        self.assertEqual(points[1].get(),(2,12))
+        self.assertEqual(points[2].get(),(3,10))
+        self.assertEqual(self.e.get().get(), (0.0,0.0))
+        self.assertEqual(self.e.get().get(), (0,2))
+        self.assertEqual(self.e.get().get(), (1,4))
+        self.assertEqual(self.e.get().get(), (1,6))
+        self.assertEqual(self.e.get().get(), (1,7))
+        self.assertEqual(self.e.get().get(), (2,9))
+        self.assertEqual(self.e.get().get(), (2,9))
+        self.assertEqual(self.e.get().get(), (2,10))
+        self.assertEqual(self.e.get().get(), (3,10))
+        self.assertEqual(self.e.get().get(), (3,10))
+        self.assertEqual(self.e.get().get(), (3,10))
         self.assertEqual(self.e.is_done(),True) 
 
+    def test_3_set_equation(self):
+        p = Point()
+        p.set(x=0,y=0)
+        p2 = Point()
+        p2.set(x=3,y=10)
+        self.e.set_equation(p2, p)
+        self.assertEqual(self.e.step, 0.1)
+        points = self.e.bezier.points
+        for point in points:
+        self.assertEqual(points[0].get(),(3,10))
+        self.assertEqual(points[1].get(),(2,12))
+        self.assertEqual(points[2].get(),(0,0))
+        self.assertEqual(self.e.get().get(), (3,10))
+        self.assertEqual(self.e.get().get(), (3,10))
+        self.assertEqual(self.e.get().get(), (3,10))
+        self.assertEqual(self.e.get().get(), (2,10))
+        self.assertEqual(self.e.get().get(), (2,9))
+        self.assertEqual(self.e.get().get(), (2,9))
+        self.assertEqual(self.e.get().get(), (1,7))
+        self.assertEqual(self.e.get().get(), (1,6))
+        self.assertEqual(self.e.get().get(), (1,4))
+        self.assertEqual(self.e.get().get(), (0,2))
+        self.assertEqual(self.e.get().get(), (0,0))
+        self.assertEqual(self.e.is_done(),True) 
 class Cannonball():
     def __init__(self):
         '''
