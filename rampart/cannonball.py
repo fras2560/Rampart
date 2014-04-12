@@ -7,7 +7,7 @@
 '''
 import math
 import unittest
-GRAVITY = -9.8
+GRAVITY = 9.81
 
 class Point():
     def __init__(self):
@@ -331,7 +331,6 @@ class TestEquation(unittest.TestCase):
         self.e.set_equation(p2, p)
         self.assertEqual(self.e.step, 0.1)
         points = self.e.bezier.points
-        for point in points:
         self.assertEqual(points[0].get(),(3,10))
         self.assertEqual(points[1].get(),(2,12))
         self.assertEqual(points[2].get(),(0,0))
@@ -347,6 +346,106 @@ class TestEquation(unittest.TestCase):
         self.assertEqual(self.e.get().get(), (0,2))
         self.assertEqual(self.e.get().get(), (0,0))
         self.assertEqual(self.e.is_done(),True) 
+
+class Equation_2():
+    def __init__(self):
+        '''
+        velocity: the initial velocity
+        y0: the y0 coordinate
+        time: the current time of the equation
+        step: how much time to move per iteration
+        x0: the x0 coordinate
+        vertical: True if movement is only vertical False otherwise
+        '''
+        self.velocity = 0
+        self.y0 = 0
+        self.time = 0
+        self.step = 0
+        self.x0 = 0
+        self.vertical = False
+        self.g = 9.81
+        
+    def set_equation(self,p1,p2):
+        '''
+        a function that set the equation using the two points given
+        Parameters:
+            p1: the first point or initial release point (Point)
+            p2: the second point or target point (Point)
+        Returns:
+            None
+        '''
+        (x1,y1) = p1.get()
+        (x2,y2) = p2.get()
+        self.y0 = y1
+        self.x0 = x1
+        top = float(y2) + 0.5*self.g * float(x2)*float(x2) - float(self.y0)
+        self.velocity = top / float(x2)
+        dx = x2 - x1
+        dy = y2 - y1
+        euclidean = math.sqrt(dx*dx + dy*dy)
+        self.vertical  = False
+        self.time = 0
+        if dx < 0:
+            #moving left
+            self.step = -(1/euclidean)
+        elif dx > 0:
+            #moving right
+            self.step = (1/euclidean)
+        else:
+            #just up/down
+            self.step = (1/euclidean)
+            self.vertical = True
+        return
+
+    def get_position(self):
+        '''
+            a function that gets the current position of the equation
+            Parameters:
+                None:
+            Returns:
+                point: the current point (Point)
+        '''
+        height = (-0.5*self.g*self.time*self.time + self.velocity*self.time + 
+                  float(self.y0)) 
+        point = Point()
+        if not self.vertical:
+            point.set(x=self.time+self.x0,y=height)
+        else:
+            point.set(x=self.x0,y=height)
+        self.time += self.step
+        return point
+
+class TestEquation2(unittest.TestCase):
+    def setUp(self):
+        self.e = Equation_2()
+    
+    def tearDown(self):
+        pass
+    
+    def test_set_equation(self):
+        p1 = Point()
+        p1.set(x=0, y=30)
+        p2 = Point()
+        p2.set(x=4,y=0)
+        self.e.set_equation(p1, p2)
+        self.assertAlmostEqual(self.e.velocity, 12.12, 2)
+        self.assertEqual(self.e.vertical, False)
+        self.assertAlmostEqual(0.0330409300228, self.e.step,2)
+        self.assertEqual(self.e.time,0)
+
+    def test_get_position(self):
+        self.e.velocity = 12.12
+        self.e.vertical = False
+        self.e.step = 0.0330409300228
+        self.e.time = 0
+        self.e.x0 = 0
+        self.e.y0 = 30
+        pos = self.e.get_position()
+        (x1,y1) = pos.get()
+        self.assertEqual(x1,0)
+        self.assertEqual(y1,30)
+        self.assertAlmostEqual(self.e.step, 0.0330409300228,2)
+
 class Cannonball():
     def __init__(self):
         '''
