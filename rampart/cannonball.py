@@ -7,68 +7,10 @@
 '''
 import math
 import unittest
+from point import Point
+
 GRAVITY = 9.81
-
-class Point():
-    def __init__(self):
-        self.x = None
-        self.y = None
-
-    def set(self,x=None,y=None):
-        '''
-        a function that sets the point values
-        Parameters:
-            x: the x co-ordinate of the point
-            y: the y co-ordinate of the point
-        Returns:
-            None
-        '''
-        if x is not None:
-            self.x = x
-        if y is not None:
-            self.y = y
-        return
-    
-    def get(self):
-        '''
-        a function that gets the points co-ordinates
-        Parameters:
-            None
-        Returns:
-            (x,y) tuple
-        '''
-        return (self.x,self.y)
-
-class TestPoint(unittest.TestCase):
-    def setUp(self):
-        self.p = Point()
-    
-    def tearDown(self):
-        pass
-    
-    def test_get(self):
-        (x,y) = self.p.get()
-        self.assertEqual(x,None)
-        self.assertEqual(y,None)
-        self.p.x = 1
-        self.p.y = 2
-        (x,y) = self.p.get()
-        self.assertEqual(x,1)
-        self.assertEqual(y,2)
-    
-    def test_set(self):
-        self.p.set(x=1)
-        (x,y) = self.p.get()
-        self.assertEqual(x,1)
-        self.assertEqual(y,None)
-        self.p.set(y=2)
-        (x,y) = self.p.get()
-        self.assertEqual(x,1)
-        self.assertEqual(y,2)
-        self.p.set(x=2,y=1)
-        (x,y) = self.p.get()
-        self.assertEqual(x,2)
-        self.assertEqual(y,1)
+BLACK    = (   0,   0,   0)
         
 class Bezier():
     def __init__(self):
@@ -364,6 +306,22 @@ class Equation_2():
         self.x0 = 0
         self.vertical = False
         self.g = 9.81
+
+    def reset(self):
+        '''
+        a function to reset the equation
+        Parameters:
+            None
+        Returns:
+            None
+        '''
+        self.velocity = 0
+        self.y0 = 0
+        self.time = 0
+        self.step = 0
+        self.x0 = 0
+        self.vertical = False
+        self.g = 9.81
         
     def set_equation(self,p1,p2):
         '''
@@ -453,10 +411,26 @@ class Cannonball():
         self.shoot -> a boolean telling whether the cannon ball
                       has been shot
         '''
-        self.equation = Equation()
+        self.equation = Equation_2()
         self._shoot = False
         self.end = None
+        self.position = None
+        self.radius = 5
     
+    def reset(self):
+        '''
+        a function that resets the Cannonball
+        Parameters:
+            None
+        Returns:
+            None
+        '''
+        self.equation.reset()
+        self._shoot = False
+        self.end = None
+        self.position = None
+        self.radius = 5
+        
     def set_equation(self,p1, p2):
         '''
             a function that two sets of points for the cannon ball path
@@ -464,20 +438,54 @@ class Cannonball():
                 p1: a tuple of the point (x,y)
                 p2: a tuple of the second point (x2,y2)
             Returns:
-                True if set equation false otherwise
+                None
+                        
         '''
-        equation = 0
-        self.end = p1[0]
-
+        self.equation.set(p1,p2)
+        self.end = p2
+        self._shoot = True
+        self.position = p1
+        
     def in_air(self):
+        '''
+        a function that checks if the cannon ball is  in the air or not
+        Parameters:
+            None
+        Returns:
+            True if still in air False otherwise
+        '''
         return self._shoot
 
     def increment(self):
         '''
         a function that moves the position of the cannonball
+        and determines if the cannonball has reached the end position
+        Parameters:
+            None
+        Returns
+            None
         '''
-        self._time += 1
+        self.position = self.equation.get_position()
+        (x1,y1) = self.position.get()
+        (x2,y2) = self.end.get()
+        dx = x2 - x1
+        dy = y2 - y1
+        euclidean = math.sqrt(dx*dx + dy*dy)
+        if eucliean < self.tol:
+            self.shoot = False
+        return
 
+
+    def get_position(self):
+        '''
+        a function that gets position of the cannonball
+        Parameters:
+            None
+        Returns:
+            (x1,y1): a tuple fo the x and y position
+        '''
+        return self.position.get()
+    
     def draw(self,pygame,screen):
         '''
         the function to draw the cannon
@@ -487,6 +495,9 @@ class Cannonball():
         Returns:
             None
         '''
+        (x,y) = self.position.get()
+        pygame.draw.circle(screen, BLACK,(int(x), int(y)),int(self.radius))
+
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
     unittest.main()
