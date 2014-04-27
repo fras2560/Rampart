@@ -9,7 +9,7 @@ import math
 import unittest
 from point import Point
 
-GRAVITY = 9.81
+GRAVITY = -0.049
 BLACK    = (   0,   0,   0)
 
 class Equation():
@@ -28,7 +28,7 @@ class Equation():
         self.step = 0
         self.x0 = 0
         self.vertical = False
-        self.g = 9.81
+        self.g = GRAVITY
 
     def reset(self):
         '''
@@ -44,9 +44,9 @@ class Equation():
         self.step = 0
         self.x0 = 0
         self.vertical = False
-        self.g = 9.81
+        self.g = GRAVITY
         
-    def set_equation(self,p1,p2):
+    def set(self,p1,p2):
         '''
         a function that set the equation using the two points given
         Parameters:
@@ -57,28 +57,32 @@ class Equation():
         '''
         (x1,y1) = p1.get()
         (x2,y2) = p2.get()
-        self.y0 = y1
-        self.x0 = x1
-        top = float(y2) + 0.5*self.g * float(x2)*float(x2) - float(self.y0)
-        self.velocity = top / float(x2)
+        print(x1,y1)
+        print(x2,y2)
         dx = x2 - x1
         dy = y2 - y1
+        self.y0 = y1
+        self.x0 = x1
+        top = float(y2) + 0.5*self.g * float(dx)*float(dx) - float(self.y0)
+        self.velocity = top / float(dx)
         euclidean = math.sqrt(dx*dx + dy*dy)
         self.vertical  = False
         self.time = 0
         if dx < 0:
             #moving left
-            self.step = -(1/euclidean)
+            self.step = -(1)
         elif dx > 0:
             #moving right
-            self.step = (1/euclidean)
+            self.step = (1)
         else:
             #just up/down
-            self.step = (1/euclidean)
+            self.step = (1)
             self.vertical = True
+        print(self.step)
+        print(self.velocity)
         return
 
-    def get_position(self):
+    def get(self):
         '''
             a function that gets the current position of the equation
             Parameters:
@@ -86,7 +90,8 @@ class Equation():
             Returns:
                 point: the current point (Point)
         '''
-        height = (-0.5*self.g*self.time*self.time + self.velocity*self.time + 
+        t = self.time
+        height = (-0.5*self.g*t*t + self.velocity*t + 
                   float(self.y0)) 
         point = Point()
         if not self.vertical:
@@ -94,38 +99,39 @@ class Equation():
         else:
             point.set(x=self.x0,y=height)
         self.time += self.step
+        print(point.get())
         return point
 
 class TestEquation(unittest.TestCase):
     def setUp(self):
-        self.e = Equation_2()
+        self.e = Equation()
     
     def tearDown(self):
         pass
     
-    def test_set_equation(self):
+    def test_set(self):
         p1 = Point()
         p1.set(x=0, y=30)
         p2 = Point()
         p2.set(x=4,y=0)
-        self.e.set_equation(p1, p2)
+        self.e.set(p1, p2)
         self.assertAlmostEqual(self.e.velocity, 12.12, 2)
         self.assertEqual(self.e.vertical, False)
-        self.assertAlmostEqual(0.0330409300228, self.e.step,2)
+        self.assertAlmostEqual(1, self.e.step,2)
         self.assertEqual(self.e.time,0)
 
-    def test_get_position(self):
+    def test_get(self):
         self.e.velocity = 12.12
         self.e.vertical = False
-        self.e.step = 0.0330409300228
+        self.e.step = 1
         self.e.time = 0
         self.e.x0 = 0
         self.e.y0 = 30
-        pos = self.e.get_position()
+        pos = self.e.get()
         (x1,y1) = pos.get()
         self.assertEqual(x1,0)
         self.assertEqual(y1,30)
-        self.assertAlmostEqual(self.e.step, 0.0330409300228,2)
+        self.assertAlmostEqual(self.e.step, 1,2)
 
 class Cannonball():
     def __init__(self):
@@ -139,6 +145,7 @@ class Cannonball():
         self.end = None
         self.position = None
         self.radius = 5
+        self.tol = 0.001
     
     def reset(self):
         '''
@@ -154,7 +161,7 @@ class Cannonball():
         self.position = None
         self.radius = 5
         
-    def set_equation(self,p1, p2):
+    def set(self,p1, p2):
         '''
             a function that two sets of points for the cannon ball path
             Parameters:
@@ -188,17 +195,25 @@ class Cannonball():
         Returns
             None
         '''
-        self.position = self.equation.get_position()
+        self.position = self.equation.get()
         (x1,y1) = self.position.get()
         (x2,y2) = self.end.get()
         dx = x2 - x1
         dy = y2 - y1
         euclidean = math.sqrt(dx*dx + dy*dy)
-        if eucliean < self.tol:
-            self.shoot = False
+        if self.past_end(x1,x2,self.equation.step):
+            self._shoot = False
         return
 
-
+    def past_end(self, a, b, direction):
+        past = False
+        print(a,b)
+        if a > b and direction > 0:
+            past = True
+        elif a < b and direction < 0:
+            past = True
+        return past
+    
     def get_position(self):
         '''
         a function that gets position of the cannonball
