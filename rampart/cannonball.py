@@ -118,6 +118,8 @@ class Cannonball(pygame.sprite.Sprite):
         self.image = pygame.image.load(fp).convert()
         self.image.set_colorkey(self.color.black)
         self.rect = self.image.get_rect()
+        self.bomb = Explosion()
+        self.exploding = False
 
     def reset(self):
         '''
@@ -132,7 +134,8 @@ class Cannonball(pygame.sprite.Sprite):
         self.end = None
         self.position = None
         self.radius = 5
-        
+        self.exploding = False
+
     def set(self,p1, p2):
         '''
             a function that two sets of points for the cannon ball path
@@ -177,7 +180,8 @@ class Cannonball(pygame.sprite.Sprite):
         dy = y2 - y1
         euclidean = math.sqrt(dx*dx + dy*dy)
         if self.past_end(x1,x2,self.equation.step):
-            self._shoot = False
+            self.exploding = True
+            self.bomb.set(self.end)
         return
 
     def past_end(self, a, b, direction):
@@ -212,6 +216,16 @@ class Cannonball(pygame.sprite.Sprite):
         (x,y) = self.position.get()
         self.rect.x = x
         self.rect.y = y
+    
+    def draw(self, surface):
+        if not self.exploding:
+            surface_blit = surface.blit
+            surface_blit(self.image, self.rect)
+        else:
+            self.bomb.update()
+            self.bomb.draw(surface)
+            if self.bomb.finished:
+                self._shoot = False
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']

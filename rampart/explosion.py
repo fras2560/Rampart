@@ -50,3 +50,7 @@ class Explosion(pygame.sprite.Sprite):
             self.load_image()
             self.finished = True
         self.stage += 1
+
+    def draw(self,surface):
+        surface_blit = surface.blit
+        surface_blit(self.image, self.rect)
