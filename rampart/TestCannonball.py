@@ -7,6 +7,7 @@
 '''
 import pygame
 from cannonball import  Cannonball
+from explosion import Explosion
 from point import Point
 SIZE = (500,500)
 BLACK    = (   0,   0,   0)
@@ -17,7 +18,7 @@ RED      = ( 255,   0,   0)
 class Tester():
     def __init__(self):
         self.screen = None
-        self.ball = Cannonball()
+        
         pygame.init()
         self.screen = pygame.display.set_mode(SIZE)
         pygame.display.set_caption("Test Cannon Shoot")
@@ -29,21 +30,35 @@ class Tester():
 
     def main(self):
         done = False
+        sprites = pygame.sprite.Group()
+        ball = None
+        bomb = None
         while not done:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     done = True
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     pos = pygame.mouse.get_pos()
-                    point = Point()
-                    point.set(x=pos[0],y=pos[1])
-                    if not self.ball.in_air():
-                        self.ball.reset()
-                        self.ball.set(self.center,point)
+                    if len(sprites) == 0:
+                        point = Point()
+                        point.set(x=pos[0],y=pos[1])
+                        ball = Cannonball()
+                        ball.set(self.center,point)
+                        sprites.add(ball)
             self.screen.fill(WHITE)
-            if self.ball.in_air():
-                self.ball.draw(pygame,self.screen)
-                self.ball.increment()
+            if ball is not None and not ball.in_air():
+                sprites.empty()
+                del ball
+                ball = None
+                bomb = Explosion()
+                bomb.set(point)
+                sprites.add(bomb)
+            if bomb is not None and bomb.finished:
+                sprites.empty()
+                del bomb
+                bomb = None
+            sprites.update()
+            sprites.draw(self.screen)
             pygame.display.flip()
             self.clock.tick(10)
         pygame.quit()
