@@ -7,10 +7,12 @@
 '''
 import math
 import unittest
+from explosion import Explosion
 from point import Point
-
+from color import Color
+import pygame
+import helper
 GRAVITY = -0.049
-BLACK    = (   0,   0,   0)
 
 class Equation():
     def __init__(self):
@@ -57,15 +59,12 @@ class Equation():
         '''
         (x1,y1) = p1.get()
         (x2,y2) = p2.get()
-        print(x1,y1)
-        print(x2,y2)
         dx = x2 - x1
         dy = y2 - y1
         self.y0 = y1
         self.x0 = x1
         top = float(y2) + 0.5*self.g * float(dx)*float(dx) - float(self.y0)
         self.velocity = top / float(dx)
-        euclidean = math.sqrt(dx*dx + dy*dy)
         self.vertical  = False
         self.time = 0
         if dx < 0:
@@ -78,8 +77,6 @@ class Equation():
             #just up/down
             self.step = (1)
             self.vertical = True
-        print(self.step)
-        print(self.velocity)
         return
 
     def get(self):
@@ -99,54 +96,29 @@ class Equation():
         else:
             point.set(x=self.x0,y=height)
         self.time += self.step
-        print(point.get())
         return point
 
-class TestEquation(unittest.TestCase):
-    def setUp(self):
-        self.e = Equation()
-    
-    def tearDown(self):
-        pass
-    
-    def test_set(self):
-        p1 = Point()
-        p1.set(x=0, y=30)
-        p2 = Point()
-        p2.set(x=4,y=0)
-        self.e.set(p1, p2)
-        self.assertAlmostEqual(self.e.velocity, 12.12, 2)
-        self.assertEqual(self.e.vertical, False)
-        self.assertAlmostEqual(1, self.e.step,2)
-        self.assertEqual(self.e.time,0)
-
-    def test_get(self):
-        self.e.velocity = 12.12
-        self.e.vertical = False
-        self.e.step = 1
-        self.e.time = 0
-        self.e.x0 = 0
-        self.e.y0 = 30
-        pos = self.e.get()
-        (x1,y1) = pos.get()
-        self.assertEqual(x1,0)
-        self.assertEqual(y1,30)
-        self.assertAlmostEqual(self.e.step, 1,2)
-
-class Cannonball():
+class Cannonball(pygame.sprite.Sprite):
     def __init__(self):
         '''
         self.equation -> the equation of the cannon ball path
         self.shoot -> a boolean telling whether the cannon ball
                       has been shot
         '''
+        pygame.sprite.Sprite.__init__(self)
         self.equation = Equation()
         self._shoot = False
         self.end = None
         self.position = None
         self.radius = 5
         self.tol = 0.001
-    
+        self.explosion = False
+        self.color = Color()
+        fp = helper.file_path("cannonball.png", image=True)
+        self.image = pygame.image.load(fp).convert()
+        self.image.set_colorkey(self.color.black)
+        self.rect = self.image.get_rect()
+
     def reset(self):
         '''
         a function that resets the Cannonball
@@ -175,6 +147,9 @@ class Cannonball():
         self.end = p2
         self._shoot = True
         self.position = p1
+        (x,y) = p1.get()
+        self.rect.x = x
+        self.rect.y = y
         
     def in_air(self):
         '''
@@ -207,14 +182,14 @@ class Cannonball():
 
     def past_end(self, a, b, direction):
         past = False
-        print(a,b)
+        print(a,b,direction)
         if a > b and direction > 0:
             past = True
         elif a < b and direction < 0:
             past = True
         return past
     
-    def get_position(self):
+    def get(self):
         '''
         a function that gets position of the cannonball
         Parameters:
@@ -224,17 +199,19 @@ class Cannonball():
         '''
         return self.position.get()
     
-    def draw(self,pygame,screen):
+    def update(self):
         '''
-        the function to draw the cannon
+        the function to update the cannonball position
         Parameters:
-            pygame: the pygame object
-            screen: the screen to draw to
+            none
         Returns:
             None
         '''
+        
+        self.increment()
         (x,y) = self.position.get()
-        pygame.draw.circle(screen, BLACK,(int(x), int(y)),int(self.radius))
+        self.rect.x = x
+        self.rect.y = y
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
