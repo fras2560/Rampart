@@ -21,7 +21,7 @@ class Explosion(pygame.sprite.Sprite):
         self.finished = False
         self.radius = 5
         self.rect = self.image.get_rect()
-    
+
     def set(self, point):
         '''
         a function to set the point of the explosion
@@ -30,6 +30,8 @@ class Explosion(pygame.sprite.Sprite):
         Returns:
             None
         '''
+        self.stage = 1
+        self.finished = False
         (x,y) = point.get()
         self.x = x
         self.y = y
@@ -45,7 +47,7 @@ class Explosion(pygame.sprite.Sprite):
         fp = helper.file_path("explosion_"+str(self.stage)+".png", image=True)
         self.image = pygame.image.load(fp).convert()
         self.image.set_colorkey(self.color.black)
-        self.pos = self.image.get_rect()
+        self.rect = self.image.get_rect()
         self.rect.x = self.x
         self.rect.y = self.y
 
@@ -67,7 +69,7 @@ class Explosion(pygame.sprite.Sprite):
             self.load_image()
         elif self.stage == 5:
             self.load_image()
-        elif self.stage == 6:
+        elif self.stage >= 6:
             self.load_image()
             self.finished = True
         self.stage += 1
