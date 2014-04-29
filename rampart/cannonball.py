@@ -140,7 +140,6 @@ class Cannonball(pygame.sprite.Sprite):
         self.position = None
         self.rect.x = -1
         self.rect.y = -1
-        self.radius = 5
         self.exploding = False
 
     def set(self,p1, p2):
@@ -156,6 +155,7 @@ class Cannonball(pygame.sprite.Sprite):
         self.equation.set(p1,p2)
         self.end = p2
         self._shoot = True
+        self.exploding = False
         self.position = p1
         (x,y) = p1.get()
         self.rect.x = x
@@ -228,11 +228,11 @@ class Cannonball(pygame.sprite.Sprite):
         Returns:
             None
         '''
-        
-        self.increment()
-        (x,y) = self.position.get()
-        self.rect.x = x
-        self.rect.y = y
+        if self._shoot and not self.exploding:
+            self.increment()
+            (x,y) = self.position.get()
+            self.rect.x = x
+            self.rect.y = y
     
     def draw(self, surface):
         '''
