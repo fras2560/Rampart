@@ -23,11 +23,25 @@ class Explosion(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
     
     def set(self, point):
+        '''
+        a function to set the point of the explosion
+        Parameters:
+            point: the point of the explosion
+        Returns:
+            None
+        '''
         (x,y) = point.get()
         self.x = x
         self.y = y
 
     def load_image(self):
+        '''
+        a function to load the current image of the explosion
+        Parameters:
+            None
+        Returns:
+            None
+        '''
         fp = helper.file_path("explosion_"+str(self.stage)+".png", image=True)
         self.image = pygame.image.load(fp).convert()
         self.image.set_colorkey(self.color.black)
@@ -36,6 +50,13 @@ class Explosion(pygame.sprite.Sprite):
         self.rect.y = self.y
 
     def update(self):
+        '''
+        a function that updates the explosion sequence
+        Parameters:
+            None
+        Returns:
+            None
+        '''
         if self.stage == 1:
             self.load_image()
         elif self. stage == 2:
@@ -52,5 +73,10 @@ class Explosion(pygame.sprite.Sprite):
         self.stage += 1
 
     def draw(self,surface):
+        '''
+        a function to draw the explosion
+        Parameters:
+            surface: the surface to draw on
+        '''
         surface_blit = surface.blit
         surface_blit(self.image, self.rect)
