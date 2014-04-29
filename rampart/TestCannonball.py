@@ -6,7 +6,7 @@
 @note: This class is used to test Cannonball manually
 '''
 import pygame
-from cannonball import  Cannonball
+from cannon import Cannon
 from cursor import Cursor
 from point import Point
 SIZE = (500,500)
@@ -31,10 +31,11 @@ class Tester():
         self.center = Point()
         self.center.set(x=SIZE[0]/2, y=SIZE[1]/2)
         self.clock = pygame.time.Clock()
-        self.ball = Cannonball()
         self.cursor = Cursor()
         self.cursor.set(self.center)
         self.speed = 1
+        self.cannon = Cannon()
+        self.cannon.set(self.center)
 
     def main(self):
         done = False
@@ -47,12 +48,10 @@ class Tester():
                 if event.type == pygame.KEYDOWN:
                     key = pygame.key.get_pressed()
                     if key[pygame.K_SPACE]:
-                        if not self.ball.in_air():
-                            (pos_x, pos_y) = self.cursor.get()
-                            point = Point()
-                            point.set(x=pos_x,y=pos_y)
-                            self.ball.reset()
-                            self.ball.set(self.center,point)
+                        (pos_x, pos_y) = self.cursor.get()
+                        point = Point()
+                        point.set(x=pos_x,y=pos_y)
+                        self.cannon.shoot(point)
                     if key[pygame.K_s]:
                         self.speed = 10
                     else:
@@ -66,9 +65,8 @@ class Tester():
                     if key[pygame.K_LEFT]:
                         self.cursor.move(horizontal=self.speed*LEFT)
             self.screen.fill(WHITE)
-            if self.ball.in_air():
-                self.ball.update()
-                self.ball.draw(self.screen)
+            self.cannon.update()
+            self.cannon.draw(self.screen)
             self.cursor.draw(self.screen)
             pygame.display.flip()
             self.clock.tick(10)
