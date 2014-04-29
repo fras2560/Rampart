@@ -23,6 +23,7 @@ class Equation():
         step: how much time to move per iteration
         x0: the x0 coordinate
         vertical: True if movement is only vertical False otherwise
+        g: the gravity constant
         '''
         self.velocity = 0
         self.y0 = 0
@@ -101,18 +102,22 @@ class Equation():
 class Cannonball(pygame.sprite.Sprite):
     def __init__(self):
         '''
-        self.equation -> the equation of the cannon ball path
-        self.shoot -> a boolean telling whether the cannon ball
+        equation: the equation of the cannon ball path
+        _shoot: a boolean telling whether the cannon ball
                       has been shot
+        end: the ending point of the cannonball
+        position: the curremt position of the cannonball
+        color: a color class
+        image: the image of the cannonball
+        rect: the image position of the image
+        bomb: the explosion object
+        exploding: a variable telling if the cannonball is exploding or not
         '''
         pygame.sprite.Sprite.__init__(self)
         self.equation = Equation()
         self._shoot = False
         self.end = None
         self.position = None
-        self.radius = 5
-        self.tol = 0.001
-        self.explosion = False
         self.color = Color()
         fp = helper.file_path("cannonball.png", image=True)
         self.image = pygame.image.load(fp).convert()
@@ -133,6 +138,8 @@ class Cannonball(pygame.sprite.Sprite):
         self._shoot = False
         self.end = None
         self.position = None
+        self.rect.x = -1
+        self.rect.y = -1
         self.radius = 5
         self.exploding = False
 
@@ -185,6 +192,16 @@ class Cannonball(pygame.sprite.Sprite):
         return
 
     def past_end(self, a, b, direction):
+        '''
+        a function that checks if the a (point) is past the b point
+        Parameters:
+            a: the x coordinate of point
+            b: the x coordinate of the second point
+            direction: an int representing which direction the point is moving
+        Returns:
+            True if past
+            False otherwise
+        '''
         past = False
         print(a,b,direction)
         if a > b and direction > 0:
@@ -218,6 +235,13 @@ class Cannonball(pygame.sprite.Sprite):
         self.rect.y = y
     
     def draw(self, surface):
+        '''
+        a function to draw the cannonball or explosion
+        Parameters:
+            surface: the surface to draw on
+        Returns:
+            None
+        '''
         if not self.exploding:
             surface_blit = surface.blit
             surface_blit(self.image, self.rect)
