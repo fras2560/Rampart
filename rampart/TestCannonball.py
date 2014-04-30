@@ -6,15 +6,16 @@
 @note: This class is used to test Cannonball manually
 '''
 import pygame
-from cannon import Cannon
+from cannons import Cannons
 from cursor import Cursor
 from point import Point
+from color import Color
 from config import  DOWN, UP, LEFT, RIGHT
 SIZE = (500,500)
 class Tester():
     def __init__(self):
         self.screen = None
-        
+        self.color = Color()
         pygame.init()
         self.screen = pygame.display.set_mode(SIZE)
         pygame.display.set_caption("Test Cannon Shoot")
@@ -23,13 +24,15 @@ class Tester():
         self.point = pygame.font.SysFont('monospace', 18)
         self.center = Point()
         self.center.set(x=SIZE[0]/2, y=SIZE[1]/2)
+        self.sec = Point()
+        self.sec.set(x=SIZE[0]/2+15, y=SIZE[1]/2)
         self.clock = pygame.time.Clock()
         self.cursor = Cursor()
         self.cursor.set(self.center)
         self.speed = 1
-        self.cannon = Cannon()
-        self.cannon.set(self.center)
-
+        self.guns = Cannons()
+        self.guns.add(self.center)
+        self.guns.add(self.sec)
     def main(self):
         done = False
         while not done:
@@ -44,7 +47,7 @@ class Tester():
                         (pos_x, pos_y) = self.cursor.get()
                         point = Point()
                         point.set(x=pos_x,y=pos_y)
-                        self.cannon.shoot(point)
+                        self.guns.shoot(point)
                     if key[pygame.K_s]:
                         self.speed = 10
                     else:
@@ -57,9 +60,9 @@ class Tester():
                         self.cursor.move(horizontal=self.speed*RIGHT)
                     if key[pygame.K_LEFT]:
                         self.cursor.move(horizontal=self.speed*LEFT)
-            self.screen.fill(WHITE)
-            self.cannon.update()
-            self.cannon.draw(self.screen)
+            self.screen.fill(self.color.white)
+            self.guns.update()
+            self.guns.draw(self.screen)
             self.cursor.draw(self.screen)
             pygame.display.flip()
             self.clock.tick(10)
