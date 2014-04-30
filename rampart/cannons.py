@@ -85,6 +85,6 @@ class Cannons(pygame.sprite.Sprite):
         done = False
         pos = 0
         while not done and pos < len(self.guns):
-            done = self.guns[pos]
+            done = self.guns[pos].shoot(end)
             pos += 1
 
