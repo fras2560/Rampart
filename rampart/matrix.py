@@ -8,25 +8,9 @@
 import unittest
 from piece import Piece
 from math import pi
+from config import DOWN,UP,LEFT,RIGHT,EMPTY,BLOCK,CANNON,GRASS,PAINTED
+from config import WATER,UP,DOWN,LEFT,RIGHT,NO_MOVE,CLOCKWISE,COUNTER_CLOCKWISE
 
-'''
---------------------------------------------------------------------------------
-Global constants
---------------------------------------------------------------------------------
-'''
-EMPTY = 0
-BLOCK = 1
-CANNON = 2
-GRASS = 3
-WATER = 4
-UP = -1
-DOWN = 1
-LEFT = -1
-RIGHT = 1
-NO_MOVE = 0
-CLOCKWISE = -pi/2
-COUNTER_CLOCKWISE = pi/2
-PAINTED = 1
 '''
 --------------------------------------------------------------------------------
 '''

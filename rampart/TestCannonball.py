@@ -9,15 +9,8 @@ import pygame
 from cannon import Cannon
 from cursor import Cursor
 from point import Point
+from config import  DOWN, UP, LEFT, RIGHT
 SIZE = (500,500)
-BLACK    = (   0,   0,   0)
-WHITE    = ( 255, 255, 255)
-GREEN    = (   0, 255,   0)
-RED      = ( 255,   0,   0)
-DOWN = 1
-UP = -1
-LEFT = -1
-RIGHT = 1
 class Tester():
     def __init__(self):
         self.screen = None

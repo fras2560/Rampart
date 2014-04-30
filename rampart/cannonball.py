@@ -12,6 +12,7 @@ from point import Point
 from color import Color
 import pygame
 import helper
+from config import  GRAVITY
 GRAVITY = -0.049
 
 class Equation():
