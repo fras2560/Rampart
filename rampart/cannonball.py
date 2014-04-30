@@ -13,7 +13,7 @@ from color import Color
 import pygame
 import helper
 from config import  GRAVITY
-GRAVITY = -0.049
+
 
 class Equation():
     def __init__(self):
@@ -99,6 +99,11 @@ class Equation():
             point.set(x=self.x0,y=height)
         self.time += self.step
         return point
+
+'''
+Currently no test for equation since it depends on GRAVITY constant
+will write tests once decide on gravity constant
+'''
 
 class Cannonball(pygame.sprite.Sprite):
     def __init__(self):
@@ -204,10 +209,11 @@ class Cannonball(pygame.sprite.Sprite):
             False otherwise
         '''
         past = False
-        print(a,b,direction)
         if a > b and direction > 0:
             past = True
         elif a < b and direction < 0:
+            past = True
+        elif a == b:
             past = True
         return past
     
@@ -251,6 +257,49 @@ class Cannonball(pygame.sprite.Sprite):
             self.bomb.draw(surface)
             if self.bomb.finished:
                 self._shoot = False
+
+class testCannonball(unittest.TestCase):
+    def setUp(self):
+        pygame.init()
+        pygame.display.set_mode((500,500))
+        self.ball = Cannonball()
+        self.start = Point()
+        self.start.set(x=100,y=100)
+        self.end = Point()
+        self.end.set(x=150,y=150)
+
+    def tearDown(self):
+        self.ball.reset()
+        pygame.quit()
+    
+    def test_set(self):
+        self.ball.set(self.start,self.end)
+        self.assertEqual(self.ball.exploding, False)
+        self.assertEqual(self.ball._shoot, True)
+        self.assertEqual(self.ball.end,self.end)
+        self.assertEqual(self.ball.position,self.start)
+        (x,y) = self.start.get()
+        self.assertEqual(self.ball.rect.x,x)
+        self.assertEqual(self.ball.rect.y,y)
+    
+    def test_in_air(self):
+        self.assertEqual(self.ball.in_air(), False)
+        self.ball._shoot = True
+        self.assertEqual(self.ball.in_air(), True)
+
+    def test_past_end(self):
+        result = self.ball.past_end(1, 2, 1)
+        self.assertEqual(result,False)
+        result = self.ball.past_end(1, 2, -1)
+        self.assertEqual(result,True)
+        result = self.ball.past_end(2, 1, -1)
+        self.assertEqual(result,False)
+        result = self.ball.past_end(3, 2, 1)
+        self.assertEqual(result,True)
+        result = self.ball.past_end(2, 2, 1)
+        self.assertEqual(result,True)
+        result = self.ball.past_end(2, 2, -1)
+        self.assertEqual(result,True)
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
