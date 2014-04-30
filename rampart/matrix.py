@@ -18,6 +18,7 @@ from config import WATER,UP,DOWN,LEFT,RIGHT,NO_MOVE,CLOCKWISE,COUNTER_CLOCKWISE
 class MatrixError(Exception):
     def __init__(self, value):
         self.value = value
+
     def __str__(self):
         return repr(self.value)
 
@@ -56,7 +57,7 @@ class Matrix():
                 r+=1
         else:
             raise Exception("Matrix not inialized properly")
-    
+
     def init_paint(self, row, column):
         if row > 0 and column > 0:
             self._paint = []
@@ -73,8 +74,7 @@ class Matrix():
                 r+=1
         else:
             raise Exception("Matrix not inialized properly")
-        
-    
+
     def print_m(self):
         '''
         a function to print the matrix
@@ -89,7 +89,7 @@ class Matrix():
                 output +=  str(cell) + " "
             print(output)
         print("-----------")
-    
+
     def print_paint(self):
         '''
         a function to print the paint
