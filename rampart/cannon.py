@@ -20,6 +20,13 @@ class Cannon(pygame.sprite.Sprite):
         self.image = pygame.image.load(fp).convert()
         self.image.set_colorkey(self.color.white)
         self.rect = self.image.get_rect()
+        self.active = True
+
+    def deactivate(self):
+        self.active = False
+
+    def activate(self):
+        self.active = True
 
     def set(self,p):
         '''
@@ -54,7 +61,7 @@ class Cannon(pygame.sprite.Sprite):
             False otherwise
         '''
         shot = False
-        if not self.ball.in_air():
+        if not self.ball.in_air() and self.active:
             self.ball.reset()
             self.ball.set(self.position, point)
             shot = True
