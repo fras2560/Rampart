@@ -5,10 +5,13 @@
 @date: 06/04/2014
 @note: This class is used for rampart game to store cannons, castles, walls
 '''
+from terrain import Terrain
+import os
+import pygame
 import unittest
 from piece import Piece
 from math import pi
-from config import DOWN,UP,LEFT,RIGHT,EMPTY,BLOCK,CANNON,GRASS,PAINTED
+from config import DOWN,UP,LEFT,RIGHT,EMPTY,BLOCK,CANNON,GRASS,PAINTED, WALL
 from config import WATER,UP,DOWN,LEFT,RIGHT,NO_MOVE,CLOCKWISE,COUNTER_CLOCKWISE
 
 '''
@@ -31,6 +34,9 @@ class Matrix():
                 self.initialize(row, column)
                 self.row = row
                 self.column = column
+        self.grass = Terrain("grass.png")
+        self.water = Terrain("sea.png")
+        self.wall = Terrain("wall.png")
 
     def initialize(self, row, column):
         '''
@@ -293,7 +299,7 @@ class Matrix():
             piece.rotate(COUNTER_CLOCKWISE)
             moved = False
         return moved
-    
+
     def paint_matrix_aux(self,x,y):
         '''
         a recursive function that will continue to paint a matrix while avoid walls
@@ -329,7 +335,7 @@ class Matrix():
         #bottom right
         if(self.valid_position(x+RIGHT,y+DOWN)):
             self.paint_matrix_aux(x+RIGHT, y+DOWN)
-            
+
     def paint_matrix(self,x,y):
         '''
         a function to paint a matrix while avoiding walls
@@ -339,7 +345,7 @@ class Matrix():
         '''
         self.init_paint(self.row, self.column)
         self.paint_matrix_aux(x, y)
-    
+
     def valid_position(self,x,y):
         '''
             a function that checks if the coordinates given are valid positions
@@ -356,15 +362,72 @@ class Matrix():
             self._paint[x][y] != PAINTED and
             self._matrix[x][y] != BLOCK)
 
+    def load_level(self,file):
+        '''
+        a function to load the level from a file
+        Parameters:
+            file: the filename
+        Returns:
+            {success:Boolean, Error:Message}
+        '''
+        fp = os.path.join('levels',file)
+        result = {}
+        result['succcess'] = True
+        resized = False
+        try:
+            with open(fp) as f:
+                row = 0
+                
+                for line in f:
+                    cells = line.split(',')
+                    if not resized:
+                        num_lines = sum(1 for line in open(fp))
+                        self.initialize(num_lines, len(cells))
+                        resized = True
+                    column = 0
+                    for cell in cells:
+                        self._matrix[row][column] = int(cell)
+                        column += 1
+                    row +=1
+        except:
+            result['error'] = "Unknown Error"
+
+        def draw(self,surface):
+            '''
+            a function that draw the game board (grass, water, etc..)
+            Parameters:
+                surface: the screen on which to draw
+            Returns:
+                None
+            '''
+            y_pos = -5
+            for row in self._matrix:
+                y_pos += 10
+                x_pos = -5
+                for cell in row:
+                    x_pos += 10
+                    if cell == WALL:
+                        self.wall.update(x=x_pos,y=y_pos)
+                        self.wall.draw(surface)
+                    elif cell == WATER:
+                        self.water.update(x=x_pos,y=y_pos)
+                        self.water.draw(surface)
+                    elif cell == GRASS:
+                        self.grass.update(x=x_pos,y=y_pos)
+                        self.grass.draw(surface)
+
 class test_case(unittest.TestCase):
 
     def setUp(self):
+        pygame.init()
+        pygame.display.set_mode((500,500))
         self.m = Matrix(3,3)
         self.p = Piece()
         self.p._T_piece()
 
+
     def tearDown(self):
-        pass
+        pygame.quit()
 
     def test_print_m(self):
         '''
@@ -393,7 +456,7 @@ class test_case(unittest.TestCase):
             self.assertEqual(False, True)
         except MatrixError:
             pass
-            
+
     def test_create_empty_row(self):
         result = self.m.create_empty_row()
         self.assertEqual(result, [0,0,0])
@@ -435,7 +498,7 @@ class test_case(unittest.TestCase):
         self.assertEqual(moved,True)
         moved = self.m.move_right(self.p)
         self.assertEqual(moved,False)
-    
+
     def test_move_left(self):
         self.m = Matrix(3,3)
         moved = self.m.move_left(self.p)
@@ -447,7 +510,7 @@ class test_case(unittest.TestCase):
         self.p.translate(1,0)
         moved = self.m.move_left(self.p)
         self.assertEqual(moved,True)
-        
+
     def test_move_down(self):
         moved = self.m.move_right(self.p)#moved into play
         self.assertEqual(moved, True)
@@ -457,7 +520,7 @@ class test_case(unittest.TestCase):
         self.p.translate(0,-1)
         moved = self.m.move_down(self.p)
         self.assertEqual(moved, False)
-        
+
     def test_rotate_piece(self):
         self.m.initialize(4, 4)
         moved = self.m.move_right(self.p)#moved into play
@@ -528,7 +591,7 @@ class test_case(unittest.TestCase):
         self.m._paint[1][1] = PAINTED
         valid = self.m.valid_position(1, 1)
         self.assertEqual(valid,False)
-        
+
     def test_paint_matrix(self):
         #complete square
         self.m.initialize(5, 5)
@@ -554,7 +617,7 @@ class test_case(unittest.TestCase):
                     [0,0,0,0,0],
                     [0,0,0,0,0]]
         self.assertEqual(self.m._paint,expected)
-        
+
     def test_paint_matrix_2(self):
         #cracked square
         self.m.initialize(5, 5)
@@ -579,7 +642,7 @@ class test_case(unittest.TestCase):
                     [PAINTED,0,0,0,PAINTED],
                     [PAINTED,PAINTED,PAINTED,PAINTED,PAINTED]]
         self.assertEqual(self.m._paint,expected)
-    
+
     def test_paint_matrix_3(self):
         #house with leaky roof
         self.m.initialize(7, 7)
@@ -611,7 +674,7 @@ class test_case(unittest.TestCase):
                     [PAINTED, 0, 0, 0, 0, 0, PAINTED],
                     [PAINTED, PAINTED, PAINTED, PAINTED, PAINTED, PAINTED, PAINTED],]
         self.assertEqual(self.m._paint,expected)
-    
+
     def test_paint_matrix_4(self):
         #house with reinforced roof
         self.m.initialize(7, 7)
@@ -647,6 +710,19 @@ class test_case(unittest.TestCase):
                     [PAINTED, 0, 0, 0, 0, 0, PAINTED ],
                     [PAINTED, PAINTED, PAINTED, PAINTED, PAINTED, PAINTED, PAINTED ],]
         self.assertEqual(self.m._paint,expected)
+
+    def test_load_level(self):
+        self.m.load_level("test.txt")
+        first = 50*[5]
+        rest = [WALL,GRASS,GRASS,GRASS,GRASS,GRASS,GRASS,GRASS,GRASS,GRASS,
+                GRASS,GRASS,GRASS,GRASS,GRASS,GRASS,GRASS,GRASS,GRASS,GRASS,
+                GRASS,WATER,WATER,WATER,GRASS,GRASS,GRASS,GRASS,GRASS,GRASS,
+                GRASS,GRASS,GRASS,GRASS,GRASS,GRASS,GRASS,GRASS,GRASS,GRASS,
+                GRASS,GRASS,GRASS,GRASS,GRASS,GRASS,GRASS,GRASS,GRASS,WALL]
+        self.assertEqual(first, self.m._matrix[0])
+        for x in range(1, len(self.m._matrix)-1):
+            self.assertEqual(rest, self.m._matrix[x])
+    
         
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
