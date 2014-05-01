@@ -21,6 +21,7 @@ BLOCK = 1
 CANNON = 2
 GRASS = 3
 WATER = 4
+WALL = 5
 PAINTED = 1
 '''
 movements
