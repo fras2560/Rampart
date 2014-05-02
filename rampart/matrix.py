@@ -7,12 +7,12 @@
 '''
 from terrain import Terrain
 import os
-import pygame
 import unittest
 from piece import Piece
 from math import pi
 from config import DOWN,UP,LEFT,RIGHT,EMPTY,BLOCK,CANNON,GRASS,PAINTED, WALL
 from config import WATER,UP,DOWN,LEFT,RIGHT,NO_MOVE,CLOCKWISE,COUNTER_CLOCKWISE
+from config import TERRAIN
 
 '''
 --------------------------------------------------------------------------------
@@ -34,9 +34,7 @@ class Matrix():
                 self.initialize(row, column)
                 self.row = row
                 self.column = column
-        self.grass = Terrain("grass.png")
-        self.water = Terrain("sea.png")
-        self.wall = Terrain("wall.png")
+
 
     def initialize(self, row, column):
         '''
@@ -391,43 +389,32 @@ class Matrix():
                     row +=1
         except:
             result['error'] = "Unknown Error"
+        return result
 
-        def draw(self,surface):
-            '''
-            a function that draw the game board (grass, water, etc..)
-            Parameters:
-                surface: the screen on which to draw
-            Returns:
-                None
-            '''
-            y_pos = -5
+    def update_square(self,x,y,terrain):
+        row = y / TERRAIN
+        column = x / TERRAIN
+        self._matrix[row][column] = terrain
+    
+    def save_level(self):
+        fp = os.path.join('levels',"saved_level.txt")
+        with open(fp) as f:
             for row in self._matrix:
-                y_pos += 10
-                x_pos = -5
-                for cell in row:
-                    x_pos += 10
-                    if cell == WALL:
-                        self.wall.update(x=x_pos,y=y_pos)
-                        self.wall.draw(surface)
-                    elif cell == WATER:
-                        self.water.update(x=x_pos,y=y_pos)
-                        self.water.draw(surface)
-                    elif cell == GRASS:
-                        self.grass.update(x=x_pos,y=y_pos)
-                        self.grass.draw(surface)
-
+                r = str(row[0])
+                for cell in row[1:]:
+                    r += "," + str(cell)
+                f.write(r)
+        return
+                
 class test_case(unittest.TestCase):
 
     def setUp(self):
-        pygame.init()
-        pygame.display.set_mode((500,500))
         self.m = Matrix(3,3)
         self.p = Piece()
         self.p._T_piece()
 
-
     def tearDown(self):
-        pygame.quit()
+        pass
 
     def test_print_m(self):
         '''
