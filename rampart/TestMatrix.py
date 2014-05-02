@@ -5,7 +5,7 @@
 @date: 01/05/2014
 @note: This class is used to test Matrix and piece manually
 '''
-from matrix import Matrix
+from rampart import Rampart
 from piece import Piece
 import pygame
 from config import UP, DOWN, LEFT, RIGHT
@@ -23,4 +23,27 @@ class Tester():
         self.point = pygame.font.SysFont('monospace', 18)
         self.clock = pygame.time.Clock()
         self.speed = 1
-        self.game = Matrix(row=50,column=50)
+        self.rampart = Rampart()
+        self.done = False
+        self.selected = 0
+    
+    def update_square(self, x,y):
+        if self.selected > 0:
+            self.game.update_square()
+
+    def main(self):
+        self.rampart.game.load_level("test.txt")
+        while not self.done:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    self.done = True
+            self.screen.fill(self.color.white)
+            self.rampart.draw(self.screen)
+            pygame.display.flip()
+            self.clock.tick(10)
+        pygame.quit()
+
+if __name__ == "__main__":
+    #import sys;sys.argv = ['', 'Test.testName']
+    test = Tester()
+    test.main()
