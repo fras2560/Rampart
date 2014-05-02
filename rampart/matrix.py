@@ -35,7 +35,6 @@ class Matrix():
                 self.row = row
                 self.column = column
 
-
     def initialize(self, row, column):
         '''
         a function that can will initialize the
@@ -398,11 +397,12 @@ class Matrix():
     
     def save_level(self):
         fp = os.path.join('levels',"saved_level.txt")
-        with open(fp) as f:
+        with open(fp, "w+") as f:
             for row in self._matrix:
                 r = str(row[0])
                 for cell in row[1:]:
                     r += "," + str(cell)
+                r += "\n"
                 f.write(r)
         return
                 
@@ -709,8 +709,26 @@ class test_case(unittest.TestCase):
         self.assertEqual(first, self.m._matrix[0])
         for x in range(1, len(self.m._matrix)-1):
             self.assertEqual(rest, self.m._matrix[x])
+
+    def test_update_square(self):
+        terrain = WALL
+        x = 15
+        y = 15
+        before  = self.m._matrix[1][1]
+        self.m.update_square(x, y, terrain)
+        result = self.m._matrix[1][1]
+        self.assertNotEqual(before, result)
+        self.assertEqual(result, WALL)
     
-        
+    def test_save_file(self):
+        self.m.save_level()
+        path = os.path.join('levels',"saved_level.txt")
+        self.assertEqual(os.path.isfile(path), True)
+        with open(path) as f:
+            for line in f:
+                self.assertEqual("0,0,0\n", line)
+        os.remove(path)
+
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
     unittest.main()      
