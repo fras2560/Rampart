@@ -23,6 +23,7 @@ GRASS = 3
 WATER = 4
 WALL = 5
 PAINTED = 1
+TERRAIN = 10 #terrain size
 '''
 movements
 '''
