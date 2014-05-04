@@ -3,17 +3,18 @@
 @contact: fras2560@mylaurier.ca
 @version: 1.0
 @date: 06/04/2014
-@note: This class us used as the castle for rampart game
+@note: This class is used as the castle for rampart game
 '''
 import pygame
 import helper
+from color import Color
 
-class Castle():
+class Castle(pygame.sprite.Sprite):
     def __init__(self):
         self.active = False
         fp = helper.file_path("castle.png", image=True)
         self.image = pygame.image.load(fp).convert()
-        self.image.set_colorkey(self.color.white)
+        self.image.set_colorkey(self.color.green)
         self.rect = self.image.get_rect()
 
     def activate(self):
