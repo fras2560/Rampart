@@ -7,7 +7,6 @@
 '''
 from cannon import Cannon
 import pygame
-import helper
 
 class Cannons(pygame.sprite.Sprite):
     '''
