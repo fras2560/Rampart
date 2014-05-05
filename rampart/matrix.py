@@ -390,12 +390,39 @@ class Matrix():
             result['error'] = "Unknown Error"
         return result
 
+    def get_position(self,x,y):
+        '''
+        a function to determine what call the x,y position lies in
+        Parameters:
+            x: the x position of the point
+            y: the y position of the point
+        Returns:
+            (column,row)
+        '''
+        return(x/TERRAIN, y/TERRAIN)
+
     def update_square(self,x,y,terrain):
+        '''
+        a function to update a specfic square
+        Parameters:
+            x: the x position of the square
+            y: the y position of the sqaure
+            terrain: the type of terrain to update to
+        Returns:
+            None
+        '''
         row = y / TERRAIN
         column = x / TERRAIN
         self._matrix[row][column] = terrain
     
     def save_level(self):
+        '''
+        a function that saves the matrix to a txt file
+        Parameters:
+            None
+        Returns:
+            None
+        '''
         fp = os.path.join('levels',"saved_level.txt")
         with open(fp, "w+") as f:
             for row in self._matrix:
