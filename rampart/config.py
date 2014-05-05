@@ -35,3 +35,7 @@ COUNTER_CLOCKWISE = pi/2
 Physics constants
 '''
 GRAVITY = -0.049
+'''
+Player constants
+'''
+LIFES = 3
