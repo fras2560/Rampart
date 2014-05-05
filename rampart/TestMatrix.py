@@ -8,7 +8,7 @@
 from rampart import Rampart
 from piece import Piece
 import pygame
-from config import UP, DOWN, LEFT, RIGHT, WATER, GRASS
+from config import UP, DOWN, LEFT, RIGHT, WATER, GRASS, CANNON
 from color import Color
 SIZE = (500,500)
 class Tester():
@@ -43,6 +43,8 @@ class Tester():
                         self.selected = GRASS
                     if key[pygame.K_2]:
                         self.selected = WATER
+                    if key[pygame.K_3]:
+                        self.selected = CANNON
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     pos = pygame.mouse.get_pos()
                     x = pos[0]
