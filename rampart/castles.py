@@ -36,7 +36,7 @@ class Castles(pygame.sprite.Sprite):
             None
         '''
         tower = Castle()
-        tower.add(point)
+        tower.set(point)
         self.towers.append(tower)
 
     def delete(self):
@@ -59,5 +59,5 @@ class Castles(pygame.sprite.Sprite):
             None
         '''
         for tower in self.towers:
-            tower.draw()
+            tower.draw(surface)
 
