@@ -12,6 +12,7 @@ from color import Color
 class Castle(pygame.sprite.Sprite):
     def __init__(self):
         self.active = False
+        self.color = Color()
         fp = helper.file_path("castle.png", image=True)
         self.image = pygame.image.load(fp).convert()
         self.image.set_colorkey(self.color.green)
