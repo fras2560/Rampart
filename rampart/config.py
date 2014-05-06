@@ -38,4 +38,4 @@ GRAVITY = -0.049
 '''
 Player constants
 '''
-LIFES = 3
+LIVES = 3
