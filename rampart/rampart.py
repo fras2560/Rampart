@@ -16,7 +16,7 @@ from player import Player
 from math import pi
 from config import DOWN,UP,LEFT,RIGHT,EMPTY,BLOCK,CANNON,GRASS,PAINTED, WALL
 from config import WATER,UP,DOWN,LEFT,RIGHT,NO_MOVE,CLOCKWISE,COUNTER_CLOCKWISE
-from config import TERRAIN
+from config import TERRAIN, CASTLE
 
 class Rampart():
     def __init__(self):
@@ -84,7 +84,7 @@ class Rampart():
             None
         '''
         (x,y) = pos.get()
-        if type == GRASS:
+        if type == GRASS or type == WATER:
             self.game.update_square(x,y,type)
         elif type == CANNON:
             self.game.update_square(x,y,type)
