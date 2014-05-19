@@ -97,7 +97,9 @@ class Rampart():
             self.game.update_square(x+TERRAIN,y,type)
             self.game.update_square(x,y+TERRAIN,type)
             self.game.update_square(x+TERRAIN,y+TERRAIN,type)
-            
+            x_pos = (x/TERRAIN) * TERRAIN
+            y_pos = (y/TERRAIN) * TERRAIN
+            pos.set(x=x_pos, y=y_pos)
             if player is not None and player == 1:
                 self.player_one.add(type,pos)
             elif player is not None and player == 2:
