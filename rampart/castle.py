@@ -52,6 +52,16 @@ class Castle(pygame.sprite.Sprite):
         self.rect.x = x
         self.rect.y = y
 
+    def get(self):
+        '''
+        a function that gets the position of the castle
+        Parameters:
+            None
+        Returns:
+            tuple (x,y)
+        '''
+        return (self.rect.x, self.rect.y)
+
     def draw(self,surface):
         '''
         a function to draw the castle to the screen
