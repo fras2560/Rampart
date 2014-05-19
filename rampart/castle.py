@@ -7,6 +7,7 @@
 '''
 import pygame
 import helper
+from config import TERRAIN
 from color import Color
 
 class Castle(pygame.sprite.Sprite):
@@ -15,6 +16,7 @@ class Castle(pygame.sprite.Sprite):
         self.color = Color()
         fp = helper.file_path("castle.png", image=True)
         self.image = pygame.image.load(fp).convert()
+        self.image = pygame.transform.scale(self.image,(2*TERRAIN,2*TERRAIN))
         self.image.set_colorkey(self.color.green)
         self.rect = self.image.get_rect()
 
