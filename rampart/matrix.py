@@ -371,21 +371,28 @@ class Matrix():
         result = {}
         result['succcess'] = True
         resized = False
+        skip = True
+        pos = 0
         try:
             with open(fp) as f:
                 row = 0
-                
                 for line in f:
-                    cells = line.split(',')
-                    if not resized:
-                        num_lines = sum(1 for line in open(fp))
-                        self.initialize(num_lines, len(cells))
-                        resized = True
-                    column = 0
-                    for cell in cells:
-                        self._matrix[row][column] = int(cell)
-                        column += 1
-                    row +=1
+                    if not skip:
+                        cells = line.split(',')
+                        if not resized:
+                            num_lines = sum(1 for line in open(fp))
+                            self.initialize(num_lines-2, len(cells))
+                            resized = True
+                        column = 0
+                        for cell in cells:
+                            self._matrix[row][column] = int(cell)
+                            column += 1
+                        row +=1
+                    else:
+                        if pos >= 1:
+                            skip = False
+                        pos += 1
+                        
         except:
             result['error'] = "Unknown Error"
         return result
@@ -414,7 +421,7 @@ class Matrix():
         row = y / TERRAIN
         column = x / TERRAIN
         self._matrix[row][column] = terrain
-    
+
     def save_level(self):
         '''
         a function that saves the matrix to a txt file
@@ -424,7 +431,7 @@ class Matrix():
             None
         '''
         fp = os.path.join('levels',"saved_level.txt")
-        with open(fp, "w+") as f:
+        with open(fp, "a") as f:
             for row in self._matrix:
                 r = str(row[0])
                 for cell in row[1:]:
@@ -432,7 +439,7 @@ class Matrix():
                 r += "\n"
                 f.write(r)
         return
-                
+
 class test_case(unittest.TestCase):
 
     def setUp(self):
