@@ -11,6 +11,7 @@ from matrix import Matrix
 import os
 import pygame
 import unittest
+from point import Point
 from piece import Piece
 from player import Player
 from math import pi
@@ -61,6 +62,26 @@ class Rampart():
         Returns:
             None
         '''
+        fp = os.path.join('levels',"saved_level.txt")
+        with open(fp, "w") as f:
+            r = ""
+            castles = self.player_one.towers.get()
+            for castle in castles:
+                print(castle)
+                x = castle[0]
+                y = castle[1]
+                r += str(x) + " " + str(y) + ","
+            r = r[0:-1] + "\n"
+            f.write(r)
+            r = ""
+            castles = self.player_two.towers.get()
+            for castle in castles:
+                x = castle[0]
+                y = castle[1]
+                r += str(x) + " " + str(y) + ","
+            r = r[0:-1] + "\n"
+            f.write(r)
+            print(r)
         self.game.save_level()
 
     def load(self, file):
@@ -71,7 +92,27 @@ class Rampart():
         Returns:
             None
         '''
-        self.game.load_level()
+        fp = os.path.join("levels",file)
+        with open(fp) as f:
+            one = f.readline()
+            one = one.replace("\n", "")
+            castles = one.split(",")
+            for castle in castles:
+                print(castle)
+                point = Point()
+                position = castle.split(" ")
+                print(position)
+                point.set(x=int(position[0]), y=int(position[1]))
+                self.add(CASTLE,point,1)
+            two = f.readline()
+            two = two.replace("\n", "")
+            castles = one.split(",")
+            for castle in castles:
+                point = Point()
+                position = castle.split(" ")
+                point.set(x=int(position[0]), y=int(position[1]))
+                self.add(CASTLE,point,2)
+        self.game.load_level(file)
 
     def add(self,type,pos, player=None):
         '''
