@@ -61,3 +61,16 @@ class Castles(pygame.sprite.Sprite):
         for tower in self.towers:
             tower.draw(surface)
 
+    def get(self):
+        '''
+        a function that gets all the castles positions
+        Parmaeters:
+            None
+        Returns:
+            list of points
+        '''
+        points = []
+        for tower in self.towers:
+            points.append(tower.get())
+        return points
+
