@@ -81,7 +81,7 @@ class Tester():
         y += 1
 
     def main(self):
-        self.rampart.game.load_level("test.txt")
+        self.rampart.load("test.txt")
         while not self.done:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -98,6 +98,8 @@ class Tester():
                         self.player = 1
                     if key[pygame.K_2]:
                         self.player = 2
+                    if key[pygame.K_s]:
+                        self.rampart.save()
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     pos = pygame.mouse.get_pos()
                     x = pos[0]
