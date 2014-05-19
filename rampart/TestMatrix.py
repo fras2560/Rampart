@@ -65,7 +65,7 @@ class Tester():
         label = self.point.render("W - Water", 1, self.color.black)
         self.screen.blit(label,(SIZE[0] - MARGIN+BULLET, y*LINE))
         y += 1
-        label = self.point.render("C - Cannon", 1, self.color.black)
+        label = self.point.render("C - Castle", 1, self.color.black)
         self.screen.blit(label,(SIZE[0] - MARGIN+BULLET, y*LINE))
         y += 1
         label = self.point.render("Press s to Save to File", 1, self.color.black)
