@@ -8,11 +8,13 @@
 import helper
 import pygame
 from color import Color
+from config import TERRAIN
 class Terrain(pygame.sprite.Sprite):
     def __init__(self,file):
         self.color = Color()
         fp = helper.file_path(file, image=True)
         self.image = pygame.image.load(fp).convert()
+        self.image = pygame.transform.scale(self.image, (TERRAIN, TERRAIN))
         self.image.set_colorkey(self.color.white)
         self.rect = self.image.get_rect()
 
