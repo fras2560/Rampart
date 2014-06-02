@@ -126,6 +126,8 @@ class Rampart():
         '''
         (x,y) = pos.get()
         if type == GRASS or type == WATER:
+            self.player_one.delete_castle(pos)
+            self.player_two.delete_castle(pos)
             self.game.update_square(x,y,type)
         elif type == CANNON:
             self.game.update_square(x,y,type)
@@ -134,13 +136,14 @@ class Rampart():
             elif player is not None and player == 2:
                 self.player_two.add(type,pos)
         elif type == CASTLE:
-            self.game.update_square(x,y,type)
-            self.game.update_square(x+TERRAIN,y,type)
-            self.game.update_square(x,y+TERRAIN,type)
-            self.game.update_square(x+TERRAIN,y+TERRAIN,type)
             x_pos = (x/TERRAIN) * TERRAIN
             y_pos = (y/TERRAIN) * TERRAIN
             pos.set(x=x_pos, y=y_pos)
+            if player is not None:
+                self.game.update_square(x,y,type)
+                self.game.update_square(x+TERRAIN,y,type)
+                self.game.update_square(x,y+TERRAIN,type)
+                self.game.update_square(x+TERRAIN,y+TERRAIN,type)
             if player is not None and player == 1:
                 self.player_one.add(type,pos)
             elif player is not None and player == 2:
