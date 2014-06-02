@@ -46,7 +46,29 @@ class Player():
         '''
         self.guns.draw(surface)
         self.towers.draw(surface)
-    
+
+    def conflict_castle(self, pos):
+        '''
+        a function to see if the position is conflicting with a castle
+        Parameters:
+            pos: the position to check (point)
+        Returns:
+            True if conflict was detected
+            False otherwise
+        '''
+        return self.towers.conflict(pos)
+
+    def delete_castle(self, pos):
+        '''
+        a function to delete a castle at the position given
+        Parameters:
+             pos: the position of the castle to delete
+        Returns:
+            True if castle was deleted
+            False otherwise
+        '''
+        return self.towers.delete_castle(pos)
+
     def add(self, type, pos):
         '''
         a function to add an object to the player
