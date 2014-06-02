@@ -88,3 +88,20 @@ class Cannon(pygame.sprite.Sprite):
         surface_blit(self.image, self.rect)
         if self.ball.in_air():
             self.ball.draw(surface)
+
+    def conflict(self,pos):
+        '''
+        a function to check if the cannon conflicts with position given
+        Parameters:
+            pos: the position to check (point)
+        Returns:
+            True if conflicts
+            False otherwise
+        '''
+        (x,y)  = pos.get()
+        x_cond = self.rect.x >= x and self.rect.x + TERRAIN <= x 
+        y_cond = self.rect.y >= y and self.rect.y + TERRAIN <= y
+        conflicting = False
+        if x_cond and y_cond:
+            conflicting = True
+        return conflicting
