@@ -74,3 +74,36 @@ class Castles(pygame.sprite.Sprite):
             points.append(tower.get())
         return points
 
+    def conflict(self,pos):
+        '''
+        a function to check if the position given is a conflicting with a castle
+        Parameters:
+            pos: the position to check (point)
+        Returns:
+            True if there is conflict
+            False otherwise
+        '''
+        conflicting = False
+        for tower in self.towers:
+            if self.tower.conflict(pos):
+                conflicting = True
+                break;
+        return conflicting
+
+    def delete_castle(self,pos):
+        '''
+        a function to delete castle if conflicts with position given
+        Parameters:
+            pos: the position of comparison
+        Returns:
+            True if a castle was deleted
+            False otherwise
+        '''
+        deleted = False
+        castle = 0
+        while not deleted and castle < len(self.towers):
+            if self.towers[castle].conflict(pos):
+                self.towers.pop(castle)
+                deleted = True
+            castle += 1
+        return deleted
