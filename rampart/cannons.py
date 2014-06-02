@@ -87,3 +87,18 @@ class Cannons(pygame.sprite.Sprite):
             done = self.guns[pos].shoot(end)
             pos += 1
 
+    def conflict(self,pos):
+        '''
+        a function to check if the position conflicts with any cannons
+        Parameters:
+            pos: the point to check if overlapp
+        Returns:
+            True if pos conflicts with a cannon
+            False otherwise
+        
+        '''
+        conflicting = False
+        for gun in self.guns:
+            if self.gun.conflict(pos):
+                conflicting  = True
+        return conflicting
