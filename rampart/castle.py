@@ -72,3 +72,22 @@ class Castle(pygame.sprite.Sprite):
         '''
         surface_blit = surface.blit
         surface_blit(self.image, self.rect)
+
+    def conflict(self,pos):
+        '''
+        a function to check if the position conflicts with a castle
+        Parameters:
+            pos: the position to check (point)
+        Returns:
+            True if the position conflicts with the castle
+            False otherwise
+        '''
+        (x,y) = pos.get()
+        x_cond = self.rect.x < x and self.rect.x + 2 * TERRAIN > x
+        y_cond = self.rect.y < y and self.rect.y + 2 * TERRAIN > y
+        print("x {0} and y {1}".format(x_cond, y_cond))
+        print("y {0}  y2 {1}".format(y, self.rect.y))
+        conflicting = False
+        if x_cond and y_cond:
+            conflicting  = True
+        return conflicting
