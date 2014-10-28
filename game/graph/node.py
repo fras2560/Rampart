@@ -23,6 +23,15 @@ Node Class
 
 class Node(pygame.sprite.Sprite):
     def __init__(self, x, y, image_file):
+        '''
+        Parameters:
+            x: the initial position of the x co-ordinate (int >= 0)
+            y: the initial position of the y co-ordinate (int >= 0 )
+            image_file: name of the image file 
+                        in the assets/image directory (string)
+        '''
+        assert x >= 0, 'Node (x < 0) not initialized properly'
+        assert y >= 0, 'Node (y < 0) not initialized properly'
         self.color = Color()
         fp = file_path(image_file, image=True)
         self.image = pygame.image.load(fp).convert()
@@ -79,8 +88,8 @@ class Test(unittest.TestCase):
         pygame.display.set_caption("Test Node Object")
         self.color = Color()
         self.screen.fill(self.color.white)
-        f = 'cannon.png'
-        self.node = Node(10, 10, f)
+        self.f = 'cannon.png'
+        self.node = Node(10, 10, self.f)
 
     def tearDown(self):
         pygame.quit()
@@ -119,6 +128,18 @@ class Test(unittest.TestCase):
         result_y = self.node.rect.y
         self.assertEqual(change, result_x)
         self.assertEqual(change, result_y)
+
+    def testFailedInitialize(self):
+        try:
+            self.node = Node(-1, -1, self.f)
+            self.assertEqual(True, False, "Should throw exception (x < 0)")
+        except AssertionError:
+            pass
+        try:
+            self.node = Node(0, -1, self.f)
+            self.assertEqual(True, False, "Should throw exception (x < 0)")
+        except AssertionError:
+            pass
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
