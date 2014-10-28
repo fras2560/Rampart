@@ -6,6 +6,7 @@
 @note: A place to hold various constants and game configurations
 '''
 from math import pi
+SIZE = (500, 500)
 '''
 directions"
 '''
