@@ -15,7 +15,7 @@ UP = -1
 LEFT = -1
 RIGHT = 1
 '''
-game matrix constants
+Node Types and Constants
 '''
 EMPTY = 0
 BLOCK = 1
@@ -26,6 +26,7 @@ WALL = 5
 CASTLE = 6
 PAINTED = 1
 TERRAIN = 10 #terrain size
+TYPES = [BLOCK, CANNON, GRASS, WATER, WALL, CASTLE]
 '''
 movements
 '''
