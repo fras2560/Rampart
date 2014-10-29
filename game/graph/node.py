@@ -13,8 +13,9 @@ Imports
 '''
 import pygame
 from rampart.helper import file_path
-from rampart.config import TERRAIN
+from rampart.config import TERRAIN, TYPES
 from rampart.color import Color
+
 '''
 -------------------------------------------------------------------------------
 Node Class
@@ -22,16 +23,18 @@ Node Class
 '''
 
 class Node(pygame.sprite.Sprite):
-    def __init__(self, x, y, image_file):
+    def __init__(self, x, y, image_file, terrain):
         '''
         Parameters:
             x: the initial position of the x co-ordinate (int >= 0)
             y: the initial position of the y co-ordinate (int >= 0 )
             image_file: name of the image file 
                         in the assets/image directory (string)
+            terrain: the type of terrain the node is (type in CONFIG)
         '''
         assert x >= 0, 'Node (x < 0) not initialized properly'
         assert y >= 0, 'Node (y < 0) not initialized properly'
+        assert terrain in TYPES, ' Node given non-valid type'
         self.color = Color()
         fp = file_path(image_file, image=True)
         self.image = pygame.image.load(fp).convert()
@@ -40,6 +43,8 @@ class Node(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
+        self.type = terrain
+        self.painted = False
 
     def update(self, x=None, y=None):
         '''
@@ -68,13 +73,53 @@ class Node(pygame.sprite.Sprite):
         surface_blit = surface.blit
         surface_blit(self.image, self.rect)
 
+    def get_type(self):
+        '''
+        a method that gets type of terrain of the node
+        Parameters:
+            None
+        Returns:
+            self.type: the type of terrain (int)
+        '''
+        return self.type
+
+    def paint(self):
+        '''
+        a method that paints the node
+        Parameters:
+            None
+        Returns:
+            None
+        '''
+        self.painted = True
+
+    def unpaint(self):
+        '''
+        a method that remove paint of a node
+        Parameters:
+            None
+        Returns:
+            None
+        '''
+        self.painted = False
+
+    def is_painted(self):
+        '''
+        a method use to see if the node is_painted
+        Parameters:
+            None
+        Returns:
+            self.painted: a boolean for whether the node is painted or not
+        '''
+        return self.painted
+
 '''
 -------------------------------------------------------------------------------
 Unittest Imports
 -------------------------------------------------------------------------------
 '''
 import unittest
-from rampart.config import SIZE
+from rampart.config import SIZE, CANNON
 '''
 -------------------------------------------------------------------------------
 Unittests for Node
@@ -89,7 +134,7 @@ class Test(unittest.TestCase):
         self.color = Color()
         self.screen.fill(self.color.white)
         self.f = 'cannon.png'
-        self.node = Node(10, 10, self.f)
+        self.node = Node(10, 10, self.f, CANNON )
 
     def tearDown(self):
         pygame.quit()
@@ -131,15 +176,22 @@ class Test(unittest.TestCase):
 
     def testFailedInitialize(self):
         try:
-            self.node = Node(-1, -1, self.f)
+            self.node = Node(-1, -1, self.f, CANNON)
             self.assertEqual(True, False, "Should throw exception (x < 0)")
         except AssertionError:
             pass
         try:
-            self.node = Node(0, -1, self.f)
+            self.node = Node(0, -1, self.f, CANNON)
             self.assertEqual(True, False, "Should throw exception (x < 0)")
         except AssertionError:
             pass
+        try:
+            self.node = Node(0, -1, self.f, len(TYPES)*10)
+            self.assertEqual(True, False,
+                             "Should throw exception (non-valid terrain)")
+        except AssertionError:
+            pass
+        
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
