@@ -12,6 +12,7 @@ Imports
 -------------------------------------------------------------------------------
 '''
 import networkx as nx
+from rampart.config import PAINTED, BLOCK
 
 class Graph():
     def __init__(self, row, column):
@@ -117,6 +118,32 @@ class Graph():
         nodes = nx.get_node_attributes(self.graph, 'nodes')
         for node in nodes:
             node.draw()
+
+    def paint(self):
+        '''
+        a method use to paint the nodes starting a top left and moving 
+        to each nodes neighbors unless blocked by a block
+        '''
+        # reset to not painted
+        nodes = nx.get_node_attributes(self.graph, 'nodes')
+        for index in range(0, len(nodes)):
+            nodes[index].unpaint()
+        self.nodes = nodes
+        self.paint_aux(0)
+
+    def paint_aux(self, node_id):
+        '''
+        a aux method used to paint all the nodes
+        Parameters:
+            node_id: the current node to paint
+        Returns:
+            None
+        '''
+        if self.nodes[node_id].get_type() != BLOCK:
+            self.nodes[node_id].paint()
+            for neighbor in self.graphs.neighbors(node_id):
+                self.paint_aux(neighbor)
+        return
 
 import unittest
 
