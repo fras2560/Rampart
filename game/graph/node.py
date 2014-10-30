@@ -15,6 +15,7 @@ import pygame
 from rampart.helper import file_path
 from rampart.config import TERRAIN, TYPES
 from rampart.color import Color
+import logging
 
 '''
 -------------------------------------------------------------------------------
@@ -23,7 +24,7 @@ Node Class
 '''
 
 class Node(pygame.sprite.Sprite):
-    def __init__(self, x, y, image_file, terrain):
+    def __init__(self, x, y, image_file, terrain, logger=None):
         '''
         Parameters:
             x: the initial position of the x co-ordinate (int >= 0)
@@ -45,6 +46,11 @@ class Node(pygame.sprite.Sprite):
         self.rect.y = y
         self.type = terrain
         self.painted = False
+        if logger is None:
+            logging.basicConfig(level=logging.INFO,
+                            format='%(asctime)s %(message)s')
+            logger = logging.getLogger(__name__)
+        self.logger=logge
 
     def update(self, x=None, y=None):
         '''
@@ -70,6 +76,7 @@ class Node(pygame.sprite.Sprite):
         Returns:
             None
         '''
+        self.logger.debug("Drawing Node")
         surface_blit = surface.blit
         surface_blit(self.image, self.rect)
 
