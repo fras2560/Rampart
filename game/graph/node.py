@@ -50,7 +50,7 @@ class Node(pygame.sprite.Sprite):
             logging.basicConfig(level=logging.INFO,
                             format='%(asctime)s %(message)s')
             logger = logging.getLogger(__name__)
-        self.logger=logge
+        self.logger=logger
 
     def update(self, x=None, y=None):
         '''
