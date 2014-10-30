@@ -11,11 +11,12 @@
 Imports
 -------------------------------------------------------------------------------
 '''
+import logging
 import networkx as nx
 from rampart.config import PAINTED, BLOCK
 
 class Graph():
-    def __init__(self, row, column):
+    def __init__(self, row, column, logger=None):
         '''
         Parameters:
             row: the number of nodes in a row (int > 0)
@@ -42,6 +43,12 @@ class Graph():
                 self.graph.add_edge(node, self.get_node_id(row, column + 1))
             if column != (self.columns - 1) and row != (self.rows - 1):
                 self.graph.add_edge(node, self.get_node_id(row + 1, column + 1))
+        if logger is None:
+            logging.basicConfig(level=logging.INFO,
+                            format='%(asctime)s %(message)s')
+            logger = logging.getLogger(__name__)
+        self.logger=logger
+        self.logger.info("Created a Graph %d X %d" % (self.rows, self.columns))
 
     def get_node_id(self, row, column):
         '''
@@ -80,6 +87,8 @@ class Graph():
         '''
         values = {self.get_node_id(row, column): node}
         nx.set_node_attributes(self.graph, 'nodes', values)
+        self.logger.info("Set (%d, %d) Node to type: %d"
+                         %(row, column, node.get_type()))
 
     def update_node(self, row, column, x=None, y=None):
         '''
@@ -93,6 +102,8 @@ class Graph():
         '''
         nodes = nx.get_node_attributes(self.graph, 'nodes')
         nodes[self.get_node_id(row, column)].update(x=x, y=y)
+        self.logger.info("Updated Position of Node (%d, %d)"
+                         %(row,column))
         return
 
     def get_node(self, row, column):
@@ -117,15 +128,20 @@ class Graph():
         '''
         nodes = nx.get_node_attributes(self.graph, 'nodes')
         for node in nodes:
-            node.draw()
+            nodes[node].draw(surface)
 
     def paint(self):
         '''
         a method use to paint the nodes starting a top left and moving 
         to each nodes neighbors unless blocked by a block
+        Parameters:
+            None
+        Returns:
+            None
         '''
         # reset to not painted
         nodes = nx.get_node_attributes(self.graph, 'nodes')
+        assert len(nodes) > 0, 'Graph not initialized with nodes'
         for index in range(0, len(nodes)):
             nodes[index].unpaint()
         self.nodes = nodes
@@ -141,21 +157,32 @@ class Graph():
         '''
         if self.nodes[node_id].get_type() != BLOCK:
             self.nodes[node_id].paint()
-            for neighbor in self.graphs.neighbors(node_id):
-                self.paint_aux(neighbor)
+            self.logger.debug("Painted Node_id %d"  %node_id)
+            for neighbor in self.graph.neighbors(node_id):
+                cond1 = not self.nodes[neighbor].is_painted()
+                cond2 = self.nodes[neighbor].get_type () != BLOCK
+                if cond1 and cond2 :
+                    self.paint_aux(neighbor)
         return
 
 import unittest
-
+from graph.node import Node
+from rampart.config import GRASS
+import pygame
 class Test(unittest.TestCase):
 
     def setUp(self):
+        logging.basicConfig(level=logging.DEBUG,
+                            format='%(asctime)s %(message)s')
+        logger = logging.getLogger(__name__)
         self.rows = 3
         self.columns = 3
-        self.g = Graph(self.rows, self.columns)
+        self.g = Graph(self.rows, self.columns, logger=logger)
+        pygame.init()
+        self.screen = pygame.display.set_mode((200, 200))
 
     def tearDown(self):
-        pass
+        pygame.quit()
 
     def testConstructor(self):
         result = len(self.g.graph.nodes())
@@ -213,6 +240,71 @@ class Test(unittest.TestCase):
         expect = (0, 1)
         self.assertEqual(node_id, expect,
                          'get_row_column: return invalid value')
+
+    def testPaintSimple(self):
+        nodes = [Node(0, 0, 'cannon.png', GRASS)] * 9
+        node_id = 0
+        for node in nodes:
+            row, column = self.g.get_row_column(node_id)
+            self.g.set_node(row, column, node)
+            node_id += 1
+        self.g.paint()
+        nodes = nx.get_node_attributes(self.g.graph, 'nodes')
+        for n in nodes:
+            self.assertEqual(nodes[n].is_painted(), True)
+
+    def testPaintPerimeterCase(self):
+        self.g = Graph(5, 5)
+        nodes = [
+                 [Node(0, 0, 'cannon.png', GRASS), 
+                  Node(0, 0, 'cannon.png', GRASS),
+                  Node(0, 0, 'cannon.png', GRASS),
+                  Node(0, 0, 'cannon.png', GRASS),
+                  Node(0, 0, 'cannon.png', GRASS)],
+                 [Node(0, 0, 'cannon.png', GRASS), 
+                  Node(0, 0, 'cannon.png', BLOCK),
+                  Node(0, 0, 'cannon.png', BLOCK),
+                  Node(0, 0, 'cannon.png', BLOCK),
+                  Node(0, 0, 'cannon.png', GRASS)],
+                 [Node(0, 0, 'cannon.png', GRASS), 
+                  Node(0, 0, 'cannon.png', BLOCK),
+                  Node(0, 0, 'cannon.png', GRASS),
+                  Node(0, 0, 'cannon.png', BLOCK),
+                  Node(0, 0, 'cannon.png', GRASS)],
+                 [Node(0, 0, 'cannon.png', GRASS), 
+                  Node(0, 0, 'cannon.png', BLOCK),
+                  Node(0, 0, 'cannon.png', BLOCK),
+                  Node(0, 0, 'cannon.png', BLOCK),
+                  Node(0, 0, 'cannon.png', GRASS)],
+                 [Node(0, 0, 'cannon.png', GRASS), 
+                  Node(0, 0, 'cannon.png', GRASS),
+                  Node(0, 0, 'cannon.png', GRASS),
+                  Node(0, 0, 'cannon.png', GRASS),
+                  Node(0, 0, 'cannon.png', GRASS)]
+                ]
+        for row in range(0, len(nodes)):
+            for column in range(0, len(nodes[row])):
+                self.g.set_node(row, column, nodes[row][column])
+        self.g.paint()
+        expect = [
+                  True, True, True, True, True,
+                  True, False, False, False, True,
+                  True, False, False, False, True,
+                  True, False, False, False, True,
+                  True, True, True, True, True
+                 ]
+        nodes = nx.get_node_attributes(self.g.graph, 'nodes')
+        for n in nodes:
+            self.assertEqual(nodes[n].is_painted(), expect[n])
+
+    def testDraw(self):
+        nodes = [Node(0, 0, 'cannon.png', GRASS)] * 9
+        node_id = 0
+        for node in nodes:
+            row, column = self.g.get_row_column(node_id)
+            self.g.set_node(row, column, node)
+            node_id += 1
+        self.g.draw(self.screen)
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
