@@ -9,7 +9,7 @@
 import logging
 from graph import Graph
 from graph.node import Node
-from rampart.config import TERRAIN_TO_FILE, NODE_SIZE
+from rampart.config import TERRAIN_TO_FILE, NODE_SIZE, CASTLE
 class Level():
     def __init__(self, file_path, logger=None):
         if logger is None:
@@ -100,6 +100,8 @@ class Level():
             None
         '''
         f_name = TERRAIN_TO_FILE[terrain]
+        x = x - x % NODE_SIZE
+        y = y -  y % NODE_SIZE
         n = Node(x, y, f_name, terrain )
         row = y // NODE_SIZE
         column = x // NODE_SIZE
