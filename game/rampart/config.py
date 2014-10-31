@@ -45,6 +45,13 @@ TERRAIN_TO_FILE = {CANNON: I_CANNON, BLOCK: I_BLOCK, GRASS: I_GRASS,
                    WATER: I_WATER, CASTLE: I_CASTLE
                   }
 '''
+Player constants
+'''
+NONPLAYER = 0
+PLAYERONE = 1
+PLAYERTWO = 2
+
+'''
 movements
 '''
 NO_MOVE = 0
