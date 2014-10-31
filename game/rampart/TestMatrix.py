@@ -7,8 +7,9 @@
 '''
 from rampart.level import Level
 import pygame
-from rampart.config import UP, DOWN, LEFT, RIGHT, WATER, GRASS, CASTLE, TERRAIN, BASE
+from rampart.config import WATER, GRASS, CASTLE, NODE_SIZE, BASE
 from rampart.color import Color
+import os
 SIZE = (700,500)
 MARGIN = 190
 LINE = 10
@@ -29,6 +30,7 @@ class Tester():
         self.done = False
         self.selected = 0
         self.player = 0
+        self.save = os.path.join(os.path.dirname(BASE), 'output.txt')
 
     def display_options(self):
         y = 1
@@ -85,13 +87,20 @@ class Tester():
                     if key[pygame.K_2]:
                         self.player = 2
                     if key[pygame.K_s]:
-                        self.level.save()
+                        self.level.save(self.save)
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     pos = pygame.mouse.get_pos()
                     x = pos[0]
                     y = pos[1]
                     if x < SIZE[0] - MARGIN and self.selected > 0:
-                        self.level.update_node(x, y, self.selected)
+                        if self.selected != CASTLE:
+                            self.level.update_node(x, y, self.selected)
+                        else:
+                            x1 = x < SIZE[0] - MARGIN - 2 * NODE_SIZE
+                            xcond =  x1 and x > NODE_SIZE
+                            ycond = y > NODE_SIZE and y < SIZE[1] - NODE_SIZE 
+                            if ycond and xcond:
+                                self.level.update_node(x, y, self.selected)
             self.screen.fill(self.color.white)
             self.display_options()
             self.level.draw(self.screen)
