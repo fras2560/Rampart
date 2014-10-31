@@ -13,7 +13,7 @@ Imports
 '''
 import pygame
 from rampart.helper import file_path
-from rampart.config import TERRAIN, TYPES
+from rampart.config import TERRAIN, TYPES, NONPLAYER
 from rampart.color import Color
 import logging
 
@@ -25,7 +25,7 @@ Node Class
 
 class Node(pygame.sprite.Sprite):
     def __init__(self, x=None, y=None, image_file=None, terrain=None,
-                 logger=None, string_object=None):
+                 logger=None, string_object=None, player=None):
         '''
         Parameters:
             x: the initial position of the x co-ordinate (int >= 0)
@@ -63,6 +63,9 @@ class Node(pygame.sprite.Sprite):
         self.rect.y = y
         self.type = terrain
         self.painted = False
+        if player is None:
+            player = NONPLAYER
+        self.player = player
         if logger is None:
             logging.basicConfig(level=logging.INFO,
                             format='%(asctime)s %(message)s')
@@ -171,6 +174,16 @@ class Node(pygame.sprite.Sprite):
             self.painted: a boolean for whether the node is painted or not
         '''
         return self.painted
+
+    def get_player(self):
+        '''
+        a method to the the player in which the node belongs to
+        Parameters:
+            None
+        Returns:
+            self.player: the id of the player (int)
+        '''
+        return self.player
 
 '''
 -------------------------------------------------------------------------------
