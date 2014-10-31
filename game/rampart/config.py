@@ -22,7 +22,7 @@ I_CANNON = 'cannon.png'
 I_GRASS = 'grass.png'
 I_WATER = 'sea.png'
 I_WALL = 'wall.png'
-I_CASTLE_0 = 'castle_0.png'
+I_CASTLE = 'castle.png'
 I_CASTLE_1 = 'castle_1.png'
 I_CASTLE_2 = 'castle_2.png'
 I_CASTLE_3 = 'castle_3.png'
@@ -41,8 +41,9 @@ CASTLE = 6
 PAINTED = 1
 TERRAIN = 10 #terrain size
 TYPES = [BLOCK, CANNON, GRASS, WATER, WALL, CASTLE]
-TERRAIN_TO_FILE = {CANNON: I_CANNON, BLOCK: I_BLOCK,
-                   GRASS: I_GRASS, WATER: I_WATER}
+TERRAIN_TO_FILE = {CANNON: I_CANNON, BLOCK: I_BLOCK, GRASS: I_GRASS,
+                   WATER: I_WATER, CASTLE: I_CASTLE
+                  }
 '''
 movements
 '''
