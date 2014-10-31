@@ -148,7 +148,7 @@ class Cannonball(pygame.sprite.Sprite):
         self.rect.y = -1
         self.exploding = False
 
-    def set(self,p1, p2):
+    def set(self, p1, p2):
         '''
             a function that two sets of points for the cannon ball path
             Parameters:
