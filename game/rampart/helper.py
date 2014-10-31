@@ -17,7 +17,7 @@ def file_path(name, image=None, sound=None):
         sound: a boolean to specify if an sound file or not
     '''
     cwd = os.getcwd()
-    while "graph" in cwd:
+    while "graph" in cwd or 'rampart' in cwd:
         cwd = os.path.dirname(cwd)
     fullname = os.path.join(cwd, "assets", name)
     if image is not None:
@@ -29,7 +29,7 @@ def file_path(name, image=None, sound=None):
 class tester(unittest.TestCase):
     def setUp(self):
         self.fp = "tester"
-        self.direct = os.getcwd()
+        self.direct = os.path.dirname(os.getcwd())
 
     def tearDown(self):
         pass
