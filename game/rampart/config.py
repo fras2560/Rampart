@@ -44,6 +44,7 @@ TYPES = [BLOCK, CANNON, GRASS, WATER, WALL, CASTLE]
 TERRAIN_TO_FILE = {CANNON: I_CANNON, BLOCK: I_BLOCK, GRASS: I_GRASS,
                    WATER: I_WATER, CASTLE: I_CASTLE
                   }
+NODE_SIZE = 10
 '''
 Player constants
 '''
@@ -57,7 +58,6 @@ movements
 NO_MOVE = 0
 CLOCKWISE = -pi/2
 COUNTER_CLOCKWISE = pi/2
-NODE_SIZE = 10
 '''
 Physics constants
 '''
