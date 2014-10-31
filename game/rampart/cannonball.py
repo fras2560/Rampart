@@ -7,9 +7,9 @@
 '''
 import math
 import unittest
-from explosion import Explosion
-from point import Point
-from color import Color
+from rampart.explosion import Explosion
+from rampart.point import Point
+from rampart.color import Color
 import pygame
 import helper
 from config import  GRAVITY
