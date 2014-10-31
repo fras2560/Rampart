@@ -145,6 +145,16 @@ class Node(pygame.sprite.Sprite):
         '''
         return self.type
 
+    def get(self):
+        '''
+        a method that gets the position of the node
+        Parameters:
+            None
+        Returns:
+            (x,y): a tuple representing the position (int)
+        '''
+        return (self.rect.x, self.rect.y)
+
     def paint(self):
         '''
         a method that paints the node
