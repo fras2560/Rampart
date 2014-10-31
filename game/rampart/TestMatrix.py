@@ -5,12 +5,10 @@
 @date: 01/05/2014
 @note: This class is used to test Matrix and piece manually
 '''
-from rampart import Rampart
-from piece import Piece
-from point import Point
+from rampart.level import Level
 import pygame
-from config import UP, DOWN, LEFT, RIGHT, WATER, GRASS, CASTLE, TERRAIN
-from color import Color
+from rampart.config import UP, DOWN, LEFT, RIGHT, WATER, GRASS, CASTLE, TERRAIN, BASE
+from rampart.color import Color
 SIZE = (700,500)
 MARGIN = 190
 LINE = 10
@@ -27,21 +25,10 @@ class Tester():
         self.point = pygame.font.SysFont('monospace', 12)
         self.clock = pygame.time.Clock()
         self.speed = 1
-        self.rampart = Rampart()
+        self.level = Level(BASE)
         self.done = False
         self.selected = 0
         self.player = 0
-
-    def update_square(self, x,y):
-        c1 = self.selected > 0
-        c2 = x <= 500 - TERRAIN
-        c3 = x > TERRAIN
-        c4 = y > TERRAIN
-        c5 = y < 500 - TERRAIN
-        p = Point()
-        p.set(x=x, y=y)
-        if  c1 and c2  and c3 and c4 and c5:
-            self.rampart.add(self.selected, p, self.player)
 
     def display_options(self):
         y = 1
@@ -81,7 +68,6 @@ class Tester():
         y += 1
 
     def main(self):
-        self.rampart.load("test.txt")
         while not self.done:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -99,15 +85,16 @@ class Tester():
                     if key[pygame.K_2]:
                         self.player = 2
                     if key[pygame.K_s]:
-                        self.rampart.save()
+                        self.level.save()
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     pos = pygame.mouse.get_pos()
                     x = pos[0]
                     y = pos[1]
-                    self.update_square(x, y)
+                    if x < SIZE[0] - MARGIN and self.selected > 0:
+                        self.level.update_node(x, y, self.selected)
             self.screen.fill(self.color.white)
             self.display_options()
-            self.rampart.draw(self.screen)
+            self.level.draw(self.screen)
             pygame.display.flip()
             self.clock.tick(10)
         pygame.quit()
