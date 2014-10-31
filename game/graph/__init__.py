@@ -50,6 +50,22 @@ class Graph():
         self.logger=logger
         self.logger.info("Created a Graph %d X %d" % (self.rows, self.columns))
 
+    def iterate(self, row=None):
+        '''
+        a method used to iterate through the graph nodes
+        Parameters:
+            row: if row is given only iterates on that row
+        Yields:
+            node: a graph node
+        '''
+        nodes = nx.get_node_attributes(self.graph, 'nodes')
+        if row is None:
+            for node in nodes:
+                yield nodes[node]
+        else:
+            for c  in range(0, self.columns):
+                yield nodes[self.get_node_id(row, c)]
+
     def get_node_id(self, row, column):
         '''
         a method the finds the node id for the (x,y) pair given
@@ -305,6 +321,26 @@ class Test(unittest.TestCase):
             self.g.set_node(row, column, node)
             node_id += 1
         self.g.draw(self.screen)
+
+    def testIterate(self):
+        nodes = [Node(0, 0, 'cannon.png', GRASS)] * 9
+        node_id = 0
+        for node in nodes:
+            row, column = self.g.get_row_column(node_id)
+            self.g.set_node(row, column, node)
+            node_id += 1
+        expect = '3:x=0y=0image=cannon.png'
+        count = 0
+        for n in self.g.iterate():
+            count += 1
+            self.assertEqual(str(n),expect)
+        self.assertEqual(count, 9)
+        count = 0
+        for n in self.g.iterate(row=0):
+            count += 1
+            self.assertEqual(str(n),expect)
+        self.assertEqual(count, 3)
+        
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
