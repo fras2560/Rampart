@@ -11,21 +11,27 @@ from config import CASTLE, CANNON, LIVES
 from rampart.cannonball import Cannonball
 from rampart.point import Point
 class Player():
-    def __init__(self):
+    def __init__(self, id=None):
         '''
         this class is used for player interactions
-        cannonballs: a dictionary to hold all the players cannonsballs and what
-                    cannon shot the ball
-        guns: a list to hold all the players cannons (Node)
-        towers: a list to hold all the towers: (Node)
-        points: the number of points the player has (int)
-        lives: the number of lives the player has
+        Parameters:
+            id: the player id (int)
+        Properties:
+            cannonballs: a dictionary to hold all the players cannonsballs and what
+                        cannon shot the ball
+            guns: a list to hold all the players cannons (Node)
+            towers: a list to hold all the towers: (Node)
+            points: the number of points the player has (int)
+            lives: the number of lives the player has (int)
         '''
         self.cannonballs = {}
         self.guns = []
         self.towers = []
         self.points = 0
         self.lives = LIVES
+        if id is None:
+            id = 1
+        self.id = id
 
     def reset(self):
         '''
@@ -114,6 +120,16 @@ class Player():
             nodes.append(self.cannonballs[ball].get())
             del self.cannonballs[ball]
         return nodes
+
+    def get_id(self):
+        '''
+        a method to get the player id
+        Parameters:
+            None
+        Returns:
+            self.id: the player id (int)
+        '''
+        return self.id
 
 import unittest
 from rampart.color import Color
