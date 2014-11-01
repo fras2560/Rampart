@@ -9,7 +9,7 @@
 import logging
 from graph import Graph
 from graph.node import Node
-from rampart.config import TERRAIN_TO_FILE, NODE_SIZE
+from rampart.config import TERRAIN_TO_FILE, NODE_SIZE, CANNON
 class Level():
     def __init__(self, file_path, logger=None):
         if logger is None:
@@ -88,7 +88,7 @@ class Level():
         '''
         self.graph.draw(surface)
 
-    def update_node(self,x, y, terrain):
+    def update_node(self,x, y, terrain, player=None):
         '''
         a method that given the (x,y) determines updates the node at
         that position to given terrain type
@@ -102,12 +102,31 @@ class Level():
         f_name = TERRAIN_TO_FILE[terrain]
         x = x - x % NODE_SIZE
         y = y -  y % NODE_SIZE
-        n = Node(x, y, f_name, terrain )
+        n = Node(x, y, f_name, terrain, player=player)
         row = y // NODE_SIZE
         column = x // NODE_SIZE
         self.graph.set_node(row, column, n)
         return
 
+    def add_cannon(self, x, y, player):
+        '''
+        a method to add a cannon to the level and the player
+        Parameters:
+            x: the x position (int)
+            y: the y position (int)
+            player: the player cannon (player)
+        Returns:
+            None
+        '''
+        f_name = TERRAIN_TO_FILE[CANNON]
+        x = x - x % NODE_SIZE
+        y = y -  y % NODE_SIZE
+        cannon = Node(x, y, f_name, CANNON, player=player.get_id())
+        row = y // NODE_SIZE
+        column = x // NODE_SIZE
+        self.graph.set_node(row, column, cannon)
+        player.add_cannon(cannon)
+        
 import unittest
 import os
 import pygame
