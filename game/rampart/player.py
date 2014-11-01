@@ -9,6 +9,7 @@ import helper
 import pygame
 from config import CASTLE, CANNON, LIVES
 from rampart.cannonball import Cannonball
+from rampart.point import Point
 class Player():
     def __init__(self):
         '''
@@ -68,7 +69,7 @@ class Player():
             None
         '''
         for ball in self.cannonballs:
-            ball.draw(surface)
+            self.cannonballs[ball].draw(surface)
 
     def shoot(self, x, y):
         '''
@@ -84,7 +85,11 @@ class Player():
             position = cannon.get()
             if position not in self.cannonballs:
                 ball = Cannonball()
-                ball.set(position, (x, y))
+                p1 = Point()
+                p1.set(position[0], position[1])
+                p2 = Point()
+                p2.set(x, y)
+                ball.set(p1, p2)
                 self.cannonballs[position] = ball
                 shot = True
                 break
@@ -100,8 +105,9 @@ class Player():
         '''
         delete = []
         nodes = []
-        for ball in self.cannonballs.items():
+        for ball in self.cannonballs:
             self.cannonballs[ball].update()
+            print(self.cannonballs[ball].get())
             if not self.cannonballs[ball].in_air():
                 delete.append(ball)
         for ball in delete:
@@ -109,3 +115,70 @@ class Player():
             del self.cannonballs[ball]
         return nodes
 
+import unittest
+from rampart.color import Color
+from graph.node import Node
+from rampart.config import CASTLE, CANNON
+class PlayerTest(unittest.TestCase):
+    def setUp(self):
+        pygame.init()
+        self.screen = pygame.display.set_mode((200, 200))
+        pygame.display.set_caption("Test Player Object")
+        self.color = Color()
+        self.screen.fill(self.color.white)
+        self.player = Player()
+
+    def tearDown(self):
+        pygame.quit()
+
+    def testReset(self):
+        pass
+
+    def addCastle(self):
+        x = 0
+        y = 0
+        castle = Node(x=x, y=y, image_file="castle.png", terrain=CASTLE,
+                      player=1)
+        self.player.add_castle(castle)
+
+    def addCannon(self, x=None, y=None):
+        if x is None:
+            x = 0
+        if y is None:
+            y = 0
+        castle = Node(x=x, y=y, image_file="cannon.png", terrain=CANNON,
+                      player=1)
+        self.player.add_cannon(castle)
+
+    def testAddCastle(self):
+        self.addCastle()
+        self.assertEqual(len(self.player.towers), 1)
+
+    def testAddCannon(self):
+        self.addCannon()
+        self.assertEqual(len(self.player.guns), 1)
+
+    def testDraw(self):
+        self.addCannon()
+        self.addCastle()
+        self.player.draw(self.screen)
+
+    def testShoot(self):
+        self.addCannon()
+        self.addCannon(x=10, y=10)
+        shot1 = self.player.shoot(10, 10)
+        shot2 = self.player.shoot(100, 100)
+        shot3 = self.player.shoot(20, 20)
+        self.assertEqual(shot1, True)
+        self.assertEqual(shot2, True)
+        self.assertEqual(shot3, False)
+
+    def testUpdate(self):
+        self.addCannon()
+        self.addCannon(x=10, y=10)
+        shot1 = self.player.shoot(10, 10)
+        delete = self.player.update()
+        while delete == []:
+            self.player.draw(self.screen)
+            delete = self.player.update()
+        self.assertEqual(delete, [(10, 10.0)])
