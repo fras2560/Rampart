@@ -5,11 +5,9 @@
 @date: 06/04/2014
 @note: This class is used for rampart game
 '''
-from point import Point
-import os
 import pygame
-import helper
-from color import Color
+import rampart.helper as helper
+from rampart.color import Color
 
 class Cursor(pygame.sprite.Sprite):
     def __init__(self):
@@ -39,9 +37,9 @@ class Cursor(pygame.sprite.Sprite):
         Returns
             (x,y): the x and y position (tuple)
         '''
-        return (self.rect.x,self.rect.y)
+        return (self.rect.x, self.rect.y)
     
-    def move(self,horizontal=0,vertical=0):
+    def move(self, horizontal=0, vertical=0):
         '''
         a function to move the cursor
         Parameters:
@@ -63,7 +61,7 @@ class Cursor(pygame.sprite.Sprite):
         '''
         pass
 
-    def draw(self,surface):
+    def draw(self, surface):
         '''
         a function to draw the cursor
         Parameters:
