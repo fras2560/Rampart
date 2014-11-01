@@ -6,11 +6,13 @@
 @note: This class is used to test Cannonball manually
 '''
 import pygame
-from cannons import Cannons
+from rampart.level import Level
+from rampart.player import Player
+from graph.node import Node
 from cursor import Cursor
 from point import Point
 from color import Color
-from config import  DOWN, UP, LEFT, RIGHT
+from config import  DOWN, UP, LEFT, RIGHT, BASE, NODE_SIZE, CANNON
 SIZE = (500,500)
 class Tester():
     def __init__(self):
@@ -30,9 +32,12 @@ class Tester():
         self.cursor = Cursor()
         self.cursor.set(self.center)
         self.speed = 1
-        self.guns = Cannons()
-        self.guns.add(self.center)
-        self.guns.add(self.sec)
+        self.level = Level(BASE)
+        self.player = Player(1)
+        self.level.add_cannon(250, 250, self.player)
+        self.level.add_cannon(260, 250, self.player)
+        
+        
     def main(self):
         done = False
         while not done:
@@ -44,10 +49,8 @@ class Tester():
                 if event.type == pygame.KEYDOWN:
                     key = pygame.key.get_pressed()
                     if key[pygame.K_SPACE]:
-                        (pos_x, pos_y) = self.cursor.get()
-                        point = Point()
-                        point.set(x=pos_x,y=pos_y)
-                        self.guns.shoot(point)
+                        x, y = self.cursor.get()
+                        self.player.shoot(x, y)
                     if key[pygame.K_s]:
                         self.speed = 10
                     else:
@@ -61,12 +64,14 @@ class Tester():
                     if key[pygame.K_LEFT]:
                         self.cursor.move(horizontal=self.speed*LEFT)
             self.screen.fill(self.color.white)
-            self.guns.update()
-            self.guns.draw(self.screen)
+            self.player.update()
+            self.level.draw(self.screen)
+            self.player.draw(self.screen)
             self.cursor.draw(self.screen)
             pygame.display.flip()
             self.clock.tick(10)
         pygame.quit()
+
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
     test = Tester()
