@@ -18,59 +18,133 @@ class PieceError(Exception):
 from math import cos,sin,pi
 
 class Piece():
+    '''
+    a Piece which holds blocks to add to the level
+    '''
     def __init__(self):
+        '''
+        Parameters:
+            None
+        Properties:
+            points: the block points
+            rotation_matrix: the matrix which holds the rotations
+            translation_matrix: the matrix which holds translations
+        '''
         self.points = []
         self.rotation_matrix = [[1,0],[0,1]] #elementary matrix
         self.translation_matrix = [[0,0],[0,0]]
 
     def reset(self):
+        '''
+        a method that resets the Piece position
+        Parameters:
+            None
+        Returns:
+            None
+        '''
         self.points = []
         self.rotation_matrix = [[1,0],[0,1]] #elementary matrix
         self.translation_matrix = [[0,0],[0,0]]
 
     def _I_piece(self):
+        '''
+        a method to create an I piece
+        Parameters:
+            None
+        Returns:
+            None
+        '''
         self.points.append([[0],[-1]])
         self.points.append([[0],[1]])
         self.points.append([[0],[2]])
         self.points.append([[0],[0]])
     
     def _J_piece(self):
+        '''
+        a method to create an J piece
+        Parameters:
+            None
+        Returns:
+            None
+        '''
         self.points.append( [[0],[0]])
         self.points.append( [[0],[1]])
         self.points.append( [[0],[-1]])
         self.points.append( [[1],[1]])
 
     def _L_piece(self):
+        '''
+        a method to create an L piece
+        Parameters:
+            None
+        Returns:
+            None
+        '''
         self.points.append( [[0],[0]])
         self.points.append( [[0],[1]])
         self.points.append( [[0],[-1]])
         self.points.append( [[-1],[1]])
 
     def _O_piece(self):
+        '''
+        a method to create an O piece
+        Parameters:
+            None
+        Returns:
+            None
+        '''
         self.points.append( [[0],[0]])
         self.points.append( [[0],[1]])
         self.points.append( [[1],[0]])
         self.points.append( [[1],[1]])
 
     def _T_piece(self):
+        '''
+        a method to create an T piece
+        Parameters:
+            None
+        Returns:
+            None
+        '''
         self.points.append( [[0],[0]])
         self.points.append( [[1],[0]])
         self.points.append( [[-1],[0]])
         self.points.append( [[0],[1]])
 
     def _Z_piece(self):
+        '''
+        a method to create an Z piece
+        Parameters:
+            None
+        Returns:
+            None
+        '''
         self.points.append([[0],[0]])
         self.points.append([[0],[-1]])
         self.points.append([[1],[-1]])
         self.points.append([[-1],[0]])
 
     def _S_piece(self):
+        '''
+        a method to create an S piece
+        Parameters:
+            None
+        Returns:
+            None
+        '''
         self.points.append( [[0],[0]])
         self.points.append([[0],[-1]])
         self.points.append( [[-1],[-1]])
         self.points.append([[1],[0]])
 
     def create_piece(self):
+        '''
+        a method used to create a random piece
+        Parameters:
+            None
+        Returns:
+            None
+        '''
         piece = randint(1,7)
         self.reset()
         if piece == 1:
@@ -88,7 +162,14 @@ class Piece():
         elif piece == 7:
             self._Z_piece()
 
-    def rotate(self,angle):
+    def rotate(self, angle):
+        '''
+        a method used to rotate a piece
+        Parameters:
+            angle: the angle by which to rotate by (float)
+        Returns:
+            None
+        '''
         a1 = (cos(angle)*self.rotation_matrix[0][0]
             +-sin(angle)*self.rotation_matrix[1][0])
         a2 = (cos(angle)*self.rotation_matrix[0][1]
@@ -101,12 +182,47 @@ class Piece():
                                [int(round(a3,0)),int(round(a4,0))]]
         return
 
-    def translate(self,x,y):
+    def clockwise_turn(self):
+        '''
+        a method to rotate the piece clockwise by 90 degrees
+        Parameters:
+            None
+        Returns:
+            None
+        '''
+        self.rotate(pi/2)
+
+    def counter_clockwise_turn(self):
+        '''
+        a method to rotate the piece counter-clockwise by 90 degrees
+        Parameters:
+            None
+        Returns:
+            None
+        '''
+        self.rotate(-pi/2)
+
+    def translate(self, x, y):
+        '''
+        a method to translate a piece (x,y) over
+        Parameters:
+            x: the x translation (float)
+            y: the y translation (float)
+        Returns:
+            None
+        '''
         self.translation_matrix[0][0] += x
         self.translation_matrix[1][1] += y
         return
 
     def return_points(self):
+        '''
+        a method that returns the points positions
+        Parameters:
+            None
+        Returns:
+            result: the list of the points (list)
+        '''
         result = []
         for point in self.points:
             p = self.matrix_multiply(self.rotation_matrix,point)
@@ -115,7 +231,15 @@ class Piece():
             result.append(p)
         return result
 
-    def matrix_multiply(self,m1,m2):
+    def matrix_multiply(self, m1, m2):
+        '''
+        a method that mutlplies the two matrices
+        Parameter:
+            m1: the first matrix (matrix)
+            m2: the second matrix (matrix)
+        Returns:
+            result: the result matrix (matrix)
+        '''
         row = 0
         result = []
         while row < len(m1):
@@ -153,24 +277,24 @@ class test_Suite(unittest.TestCase):
 
     def test_transformation(self):
         self.p.translate(1, 1)
-        expected = [[2,0],[0,2]]
+        expected = [[1,0],[0,1]]
         self.assertEqual(expected, self.p.translation_matrix)
         self.p.translate(0,1)
-        expected = [[2,0],[0,3]]
+        expected = [[1,0],[0,2]]
         self.assertEqual(expected, self.p.translation_matrix)
     
     def test_matrix_multiply(self):
-        result = self.p.matrix_multiply(self.p.translation_matrix,
+        result = self.p.matrix_multiply([[1, 0],[0, 1]],
                                self.p.rotation_matrix)
         expected = [[1,0],[0,1]]
         self.p.rotate(pi/2)
         self.assertEqual(result, expected)
-        result = self.p.matrix_multiply(self.p.translation_matrix,
+        result = self.p.matrix_multiply([[1, 0],[0, 1]],
                                self.p.rotation_matrix)
         expected = [[0.0,-1],[1,0]]
         self.assertEqual(result, expected)
         self.p.translate(2, 0)
-        result = self.p.matrix_multiply(self.p.translation_matrix,
+        result = self.p.matrix_multiply([[1, 0],[0, 1]],
                                self.p.rotation_matrix)
         expected = [[0.0,-1],[1,0]]
 
