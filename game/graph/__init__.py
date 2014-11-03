@@ -329,7 +329,7 @@ class Test(unittest.TestCase):
             row, column = self.g.get_row_column(node_id)
             self.g.set_node(row, column, node)
             node_id += 1
-        expect = '3:x=0y=0image=cannon.png'
+        expect = '3:x=0y=0image=cannon.pngplayer=0'
         count = 0
         for n in self.g.iterate():
             count += 1
