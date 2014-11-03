@@ -42,7 +42,7 @@ class Node(pygame.sprite.Sprite):
             logger is always an option argument
         '''
         if string_object is not None:
-            terrain, x, y, image_file = self.parse_string(string_object)
+            terrain, x, y, image_file, player = self.parse_string(string_object)
         else:
             assert x is not None, 'Node not given x property'
             assert y is not None, 'Node not given y property'
@@ -84,6 +84,7 @@ class Node(pygame.sprite.Sprite):
         to_string += "x=" + str(self.rect.x)
         to_string += "y=" + str(self.rect.y)
         to_string += 'image=' + self.image_file
+        to_string += 'player='+str(self.player)
         return to_string
 
     def parse_string(self, string_object):
@@ -96,6 +97,7 @@ class Node(pygame.sprite.Sprite):
             x: the x position (int)
             y: the y position (int)
             f: the file name of the image (string)
+            player: wich player the node belons to (int)
         '''
         parts = string_object.split(":")
         assert len(parts) == 2, 'Node->parse_string: Invalid String'
@@ -104,8 +106,10 @@ class Node(pygame.sprite.Sprite):
         x = int(parts[0].replace("x=", ""))
         parts = parts[1].split("image=")
         y = int(parts[0])
-        f = parts[1]
-        return terrain, x, y, f
+        parts = parts[1].split("player=")
+        f = parts[0]
+        player = int(parts[1])
+        return terrain, x, y, f, player
 
     def update(self, x=None, y=None):
         '''
@@ -276,9 +280,9 @@ class Test(unittest.TestCase):
 
     def testStrAndParseString(self):
         node_string = str(self.node)
-        expect = '2:x=10y=10image=cannon.png'
+        expect = '2:x=10y=10image=cannon.pngplayer=0'
         self.assertEqual(node_string, expect)
-        expect = (2, 10, 10, 'cannon.png')
+        expect = (2, 10, 10, 'cannon.png', 0)
         result = self.node.parse_string(node_string)
         self.assertEqual(result, expect)
 
