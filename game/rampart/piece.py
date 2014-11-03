@@ -8,14 +8,16 @@
 import unittest
 from random import randint
 from math import cos,sin,pi
+from rampart.config import NODE_SIZE
 import pprint
+import pygame
 
 class PieceError(Exception):
     def __init__(self, value):
         self.value = value
     def __str__(self):
         return repr(self.value)
-from math import cos,sin,pi
+
 
 class Piece():
     '''
@@ -228,7 +230,7 @@ class Piece():
             p = self.matrix_multiply(self.rotation_matrix,point)
             p[0][0] += self.translation_matrix[0][0]
             p[1][0] += self.translation_matrix[1][1]
-            result.append(p)
+            result.append((p[0][0], p[1][0]))
         return result
 
     def matrix_multiply(self, m1, m2):
@@ -256,6 +258,19 @@ class Piece():
             result.append(row_result)
             row += 1
         return result
+
+    def draw(self, surface, color):
+        '''
+        a method to draw the piece outline
+        Parameters:
+            surface: the pygame display screen (surface)
+        Returns:
+            None
+        '''
+        points = self.return_points()
+        for point in points:
+            pygame.draw.rect(surface, color,
+                             (point[0], point[1], NODE_SIZE, NODE_SIZE))
 
 class test_Suite(unittest.TestCase):
     def setUp(self):
@@ -302,18 +317,15 @@ class test_Suite(unittest.TestCase):
         self.p._T_piece()
         self.p.rotate(-pi/2)
         result = self.p.return_points()
-        expected = [[[0.0], [0.0]], [[0.0], [-1.0]],
-                    [[0.0], [1.0]], [[1.0], [0.0]]]
+        expected = [(0, 0), (0, -1), (0, 1), (1, 0)]
         self.assertEqual(result, expected)
         self.p.translate(2, 0)
         result = self.p.return_points()
-        expected = [[[2.0], [0.0]], [[2.0], [-1.0]], [[2.0],
-                    [1.0]], [[3.0], [0.0]]]
+        expected = [(2, 0), (2, -1), (2, 1), (3, 0)]
         self.assertEqual(result, expected)
         self.p.rotate(-pi/2)
         result = self.p.return_points()
-        expected = [[[2.0], [0.0]], [[1.0], [0.0]],
-                    [[3.0], [0.0]], [[2.0], [-1.0]]]
+        expected = [(2, 0), (1, 0), (3, 0), (2, -1)]
         self.assertEqual(result, expected)
 
 
