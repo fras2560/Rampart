@@ -16,6 +16,11 @@ UP = -1
 LEFT = -1
 RIGHT = 1
 '''
+a list of game modes
+'''
+BUILDING = 0
+SHOOTING = 1
+'''
 list of assets Images
 '''
 I_CANNON = 'cannon.png'
