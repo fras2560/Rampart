@@ -9,7 +9,7 @@
 import logging
 from graph import Graph
 from graph.node import Node
-from rampart.config import TERRAIN_TO_FILE, NODE_SIZE, CANNON
+from rampart.config import TERRAIN_TO_FILE, NODE_SIZE, CANNON, CANBUILD, BLOCK
 class Level():
     def __init__(self, file_path, logger=None):
         if logger is None:
@@ -126,7 +126,40 @@ class Level():
         column = x // NODE_SIZE
         self.graph.set_node(row, column, cannon)
         player.add_cannon(cannon)
-        
+
+    def add_piece(self, player):
+        '''
+        a method used to add the piece of the player to the level
+        Parameters:
+            piece: the building piece to add (Piece)
+        Returns:
+            True if able to add piece, False otherwise (boolean)
+        '''
+        added = False
+        # check if able to add piece
+        valid = True
+        piece = player.get_piece()
+        for point in piece.return_points():
+            column = point[0] 
+            row = point[1]
+            column = column - column % NODE_SIZE
+            row = row - row % NODE_SIZE
+            node = self.graph.get_node_id(row, column)
+            if node.get_type() not in CANBUILD:
+                valid = False
+                break
+        if valid:
+            added = True
+            for point in piece.return_points():
+                column = point[0]
+                row = point[1]
+                column = column - column % NODE_SIZE
+                row = row - row % NODE_SIZE
+                add_node = Node(x=column, y=row, image_file=TERRAIN_TO_FILE[BLOCK],
+                                player=player.get_id())
+                self.graph.set_node(row, column, add_node)
+        return added
+
 import unittest
 import os
 import pygame
