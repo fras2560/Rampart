@@ -29,15 +29,13 @@ class Tester():
         self.sec = Point()
         self.sec.set(x=SIZE[0]/2+15, y=SIZE[1]/2)
         self.clock = pygame.time.Clock()
-        self.cursor = Cursor()
-        self.cursor.set(self.center)
         self.speed = 1
         self.level = Level(BASE)
-        self.player = Player(1)
+        self.player = Player(1, self.center)
+        self.player.shoot_mode()
         self.level.add_cannon(250, 250, self.player)
         self.level.add_cannon(260, 250, self.player)
-        
-        
+
     def main(self):
         done = False
         while not done:
@@ -49,25 +47,23 @@ class Tester():
                 if event.type == pygame.KEYDOWN:
                     key = pygame.key.get_pressed()
                     if key[pygame.K_SPACE]:
-                        x, y = self.cursor.get()
-                        self.player.shoot(x, y)
+                        self.player.shoot()
                     if key[pygame.K_s]:
-                        self.speed = 10
+                        self.speed = 20
                     else:
-                        self.speed = 1
+                        self.speed = 10
                     if key[pygame.K_UP]:
-                        self.cursor.move(vertical=self.speed*UP)
+                        self.player.move(vertical=self.speed*UP)
                     if key[pygame.K_DOWN]:
-                        self.cursor.move(vertical=self.speed*DOWN)
+                        self.player.move(vertical=self.speed*DOWN)
                     if key[pygame.K_RIGHT]:
-                        self.cursor.move(horizontal=self.speed*RIGHT)
+                        self.player.move(horizontal=self.speed*RIGHT)
                     if key[pygame.K_LEFT]:
-                        self.cursor.move(horizontal=self.speed*LEFT)
+                        self.player.move(horizontal=self.speed*LEFT)
             self.screen.fill(self.color.white)
             self.player.update()
             self.level.draw(self.screen)
             self.player.draw(self.screen)
-            self.cursor.draw(self.screen)
             pygame.display.flip()
             self.clock.tick(10)
         pygame.quit()
