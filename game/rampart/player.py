@@ -158,6 +158,16 @@ class Player():
         '''
         return self.id
 
+    def get_piece(self):
+        '''
+        a method to get the player's piece
+        Parameters:
+            None
+        Returns:
+            self.piece: the player's piece
+        '''
+        return self.piece
+
     def shoot_mode(self):
         '''
         a method use to change the player's mode to shooing
