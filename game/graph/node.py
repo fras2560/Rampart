@@ -14,7 +14,7 @@ Imports
 import pygame
 from rampart.helper import file_path
 from rampart.config import TERRAIN, TYPES, NONPLAYER, TERRAIN_TO_FILE
-from rampart.config import NORMAL, DESTROYED, PAINTED
+from rampart.config import NORMAL, NODE_SIZE
 from rampart.color import Color
 import logging
 
@@ -56,14 +56,19 @@ class Node(pygame.sprite.Sprite):
         image_files = TERRAIN_TO_FILE[terrain]
         self.images = []
         self.rects = []
-        for f in image_files:
-            fp = file_path(f, image=True)
-            image = pygame.image.load(fp).convert()
-            image = pygame.transform.scale(image, (TERRAIN, TERRAIN))
-            image.set_colorkey(self.color.green)
-            rect = image.get_rect()
-            self.images.append(image)
-            self.rects.append(rect)
+        for f_type in image_files:
+            images = []
+            rects = []
+            for f in f_type:
+                fp = file_path(f, image=True)
+                image = pygame.image.load(fp).convert()
+                image = pygame.transform.scale(image, (TERRAIN, TERRAIN))
+                image.set_colorkey(self.color.green)
+                rect = image.get_rect()
+                images.append(image)
+                rects.append(rect)
+            self.images.append(images)
+            self.rects.append(rects)
         self.x = x
         self.y = y
         self.type = terrain
@@ -139,9 +144,14 @@ class Node(pygame.sprite.Sprite):
         '''
         self.logger.debug("Drawing Node")
         surface_blit = surface.blit
-        self.rects[self.state].x = self.x
-        self.rects[self.state].y = self.y
-        surface_blit(self.images[self.state], self.rects[self.state])
+        row = self.x // NODE_SIZE
+        column = self.y // NODE_SIZE
+        odd = (row % 2 + column) % 2
+        if odd == 1 and len(self.rects[self.state]) <= 1:
+            odd = 0
+        self.rects[self.state][odd].x = self.x
+        self.rects[self.state][odd].y = self.y
+        surface_blit(self.images[self.state][odd], self.rects[self.state][odd])
 
     def get_type(self):
         '''
@@ -209,7 +219,7 @@ Unittest Imports
 -------------------------------------------------------------------------------
 '''
 import unittest
-from rampart.config import SIZE, CANNON
+from rampart.config import SIZE, CANNON, GRASS
 '''
 -------------------------------------------------------------------------------
 Unittests for Node
