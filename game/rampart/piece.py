@@ -56,9 +56,9 @@ class Piece():
         Returns:
             None
         '''
-        self.points.append([[0],[-1]])
-        self.points.append([[0],[1]])
-        self.points.append([[0],[2]])
+        self.points.append([[0],[-NODE_SIZE]])
+        self.points.append([[0],[NODE_SIZE]])
+        self.points.append([[0],[2 * NODE_SIZE]])
         self.points.append([[0],[0]])
     
     def _J_piece(self):
@@ -70,9 +70,9 @@ class Piece():
             None
         '''
         self.points.append( [[0],[0]])
-        self.points.append( [[0],[1]])
-        self.points.append( [[0],[-1]])
-        self.points.append( [[1],[1]])
+        self.points.append( [[0],[NODE_SIZE]])
+        self.points.append( [[0],[-NODE_SIZE]])
+        self.points.append( [[NODE_SIZE],[NODE_SIZE]])
 
     def _L_piece(self):
         '''
@@ -83,9 +83,9 @@ class Piece():
             None
         '''
         self.points.append( [[0],[0]])
-        self.points.append( [[0],[1]])
-        self.points.append( [[0],[-1]])
-        self.points.append( [[-1],[1]])
+        self.points.append( [[0],[NODE_SIZE]])
+        self.points.append( [[0],[-NODE_SIZE]])
+        self.points.append( [[-NODE_SIZE],[NODE_SIZE]])
 
     def _O_piece(self):
         '''
@@ -96,9 +96,9 @@ class Piece():
             None
         '''
         self.points.append( [[0],[0]])
-        self.points.append( [[0],[1]])
-        self.points.append( [[1],[0]])
-        self.points.append( [[1],[1]])
+        self.points.append( [[0],[NODE_SIZE]])
+        self.points.append( [[NODE_SIZE],[0]])
+        self.points.append( [[NODE_SIZE],[NODE_SIZE]])
 
     def _T_piece(self):
         '''
@@ -109,9 +109,9 @@ class Piece():
             None
         '''
         self.points.append( [[0],[0]])
-        self.points.append( [[1],[0]])
-        self.points.append( [[-1],[0]])
-        self.points.append( [[0],[1]])
+        self.points.append( [[NODE_SIZE],[0]])
+        self.points.append( [[-NODE_SIZE],[0]])
+        self.points.append( [[0],[NODE_SIZE]])
 
     def _Z_piece(self):
         '''
@@ -122,9 +122,9 @@ class Piece():
             None
         '''
         self.points.append([[0],[0]])
-        self.points.append([[0],[-1]])
-        self.points.append([[1],[-1]])
-        self.points.append([[-1],[0]])
+        self.points.append([[0],[-NODE_SIZE]])
+        self.points.append([[1],[-NODE_SIZE]])
+        self.points.append([[-NODE_SIZE],[0]])
 
     def _S_piece(self):
         '''
@@ -135,9 +135,9 @@ class Piece():
             None
         '''
         self.points.append( [[0],[0]])
-        self.points.append([[0],[-1]])
-        self.points.append( [[-1],[-1]])
-        self.points.append([[1],[0]])
+        self.points.append([[0],[-NODE_SIZE]])
+        self.points.append( [[-NODE_SIZE],[-NODE_SIZE]])
+        self.points.append([[NODE_SIZE],[0]])
 
     def create_piece(self):
         '''
@@ -317,15 +317,17 @@ class test_Suite(unittest.TestCase):
         self.p._T_piece()
         self.p.rotate(-pi/2)
         result = self.p.return_points()
-        expected = [(0, 0), (0, -1), (0, 1), (1, 0)]
+        expected = [(0, 0), (0, -NODE_SIZE), (0, NODE_SIZE), (NODE_SIZE, 0)]
         self.assertEqual(result, expected)
-        self.p.translate(2, 0)
+        self.p.translate(2*NODE_SIZE, 0)
         result = self.p.return_points()
-        expected = [(2, 0), (2, -1), (2, 1), (3, 0)]
+        expected = [(2*NODE_SIZE, 0), (2*NODE_SIZE, -NODE_SIZE),
+                    (2*NODE_SIZE, NODE_SIZE), (3*NODE_SIZE, 0)]
         self.assertEqual(result, expected)
         self.p.rotate(-pi/2)
         result = self.p.return_points()
-        expected = [(2, 0), (1, 0), (3, 0), (2, -1)]
+        expected = [(2*NODE_SIZE, 0), (NODE_SIZE, 0),
+                    (3*NODE_SIZE, 0), (2*NODE_SIZE, -NODE_SIZE)]
         self.assertEqual(result, expected)
 
 
