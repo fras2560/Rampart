@@ -22,8 +22,8 @@ class Player():
             point: the starting point of the player's cursor
             color: the player's color
         Properties:
-            cannonballs: a dictionary to hold all the players cannonsballs and what
-                        cannon shot the ball
+            cannonballs: a dictionary to hold all the players cannonsballs 
+                        and what cannon shot the ball
             guns: a list to hold all the players cannons (Node)
             towers: a list to hold all the towers: (Node)
             points: the number of points the player has (int)
@@ -189,9 +189,7 @@ class Player():
         self.mode = BUILDING
 
 import unittest
-from rampart.color import Color
 from graph.node import Node
-from rampart.config import CASTLE, CANNON
 class PlayerTest(unittest.TestCase):
     def setUp(self):
         pygame.init()
