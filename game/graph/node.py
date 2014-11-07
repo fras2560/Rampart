@@ -13,7 +13,8 @@ Imports
 '''
 import pygame
 from rampart.helper import file_path
-from rampart.config import TERRAIN, TYPES, NONPLAYER
+from rampart.config import TERRAIN, TYPES, NONPLAYER, TERRAIN_TO_FILE
+from rampart.config import NORMAL, DESTROYED, PAINTED
 from rampart.color import Color
 import logging
 
@@ -24,7 +25,7 @@ Node Class
 '''
 
 class Node(pygame.sprite.Sprite):
-    def __init__(self, x=None, y=None, image_file=None, terrain=None,
+    def __init__(self, x=None, y=None, terrain=None,
                  logger=None, string_object=None, player=None):
         '''
         Parameters:
@@ -35,34 +36,39 @@ class Node(pygame.sprite.Sprite):
             terrain: the type of terrain the node is (type in CONFIG)
             logger: the logger of the node object (logger)
             string_object: the string representing the obejct (string)
+            player: the player id (int)
         Ways to Initialize:
-            Node(x=int, y=int, image_file=string, terrain=int)
+            Node(x=int, y=int, terrain=int)
             OR
             Node(string_object=string)
             logger is always an option argument
         '''
         if string_object is not None:
-            terrain, x, y, image_file, player = self.parse_string(string_object)
+            terrain, x, y, player = self.parse_string(string_object)
         else:
             assert x is not None, 'Node not given x property'
             assert y is not None, 'Node not given y property'
-            assert image_file is not None, 'Node not given image_file property'
             assert terrain is not None, 'Node not given terrain property'
         assert x >= 0, 'Node (x < 0) not initialized properly'
         assert y >= 0, 'Node (y < 0) not initialized properly'
         assert terrain in TYPES, ' Node given non-valid type'
-        assert type(image_file) is str, 'Node given non-valid image file'
         self.color = Color()
-        self.image_file = image_file
-        fp = file_path(image_file, image=True)
-        self.image = pygame.image.load(fp).convert()
-        self.image = pygame.transform.scale(self.image, (TERRAIN, TERRAIN))
-        self.image.set_colorkey(self.color.white)
-        self.rect = self.image.get_rect()
-        self.rect.x = x
-        self.rect.y = y
+        image_files = TERRAIN_TO_FILE[terrain]
+        self.images = []
+        self.rects = []
+        for f in image_files:
+            fp = file_path(f, image=True)
+            image = pygame.image.load(fp).convert()
+            image = pygame.transform.scale(image, (TERRAIN, TERRAIN))
+            image.set_colorkey(self.color.green)
+            rect = image.get_rect()
+            self.images.append(image)
+            self.rects.append(rect)
+        self.x = x
+        self.y = y
         self.type = terrain
         self.painted = False
+        self.state = NORMAL
         if player is None:
             player = NONPLAYER
         self.player = player
@@ -81,9 +87,8 @@ class Node(pygame.sprite.Sprite):
             to_string: the string representing the object (string)
         '''
         to_string = str(self.get_type()) + ":"
-        to_string += "x=" + str(self.rect.x)
-        to_string += "y=" + str(self.rect.y)
-        to_string += 'image=' + self.image_file
+        to_string += "x=" + str(self.x)
+        to_string += "y=" + str(self.y)
         to_string += 'player='+str(self.player)
         return to_string
 
@@ -96,7 +101,6 @@ class Node(pygame.sprite.Sprite):
             terrain: the terrain type (int)
             x: the x position (int)
             y: the y position (int)
-            f: the file name of the image (string)
             player: wich player the node belons to (int)
         '''
         parts = string_object.split(":")
@@ -104,12 +108,10 @@ class Node(pygame.sprite.Sprite):
         terrain = int(parts[0])
         parts = parts[1].split("y=")
         x = int(parts[0].replace("x=", ""))
-        parts = parts[1].split("image=")
-        y = int(parts[0])
         parts = parts[1].split("player=")
-        f = parts[0]
+        y = int(parts[0])
         player = int(parts[1])
-        return terrain, x, y, f, player
+        return terrain, x, y, player
 
     def update(self, x=None, y=None):
         '''
@@ -122,10 +124,10 @@ class Node(pygame.sprite.Sprite):
         '''
         if x is not None:
             assert x >= 0, 'Node->update not given positive value for x'
-            self.rect.x = x
+            self.x = x
         if y is not None:
             assert y >= 0, 'Node->update not given positive value for y'
-            self.rect.y = y
+            self.y = y
 
     def draw(self, surface):
         '''
@@ -137,7 +139,9 @@ class Node(pygame.sprite.Sprite):
         '''
         self.logger.debug("Drawing Node")
         surface_blit = surface.blit
-        surface_blit(self.image, self.rect)
+        self.rects[self.state].x = self.x
+        self.rects[self.state].y = self.y
+        surface_blit(self.images[self.state], self.rects[self.state])
 
     def get_type(self):
         '''
@@ -157,7 +161,7 @@ class Node(pygame.sprite.Sprite):
         Returns:
             (x,y): a tuple representing the position (int)
         '''
-        return (self.rect.x, self.rect.y)
+        return (self.x, self.y)
 
     def paint(self):
         '''
@@ -220,7 +224,7 @@ class Test(unittest.TestCase):
         self.color = Color()
         self.screen.fill(self.color.white)
         self.f = 'cannon.png'
-        self.node = Node(10, 10, self.f, CANNON )
+        self.node = Node(10, 10, CANNON )
 
     def tearDown(self):
         pygame.quit()
@@ -231,32 +235,32 @@ class Test(unittest.TestCase):
 
     def testUpdate(self):
         # only change x
-        before_x = self.node.rect.x
-        before_y = self.node.rect.y
+        before_x = self.node.x
+        before_y = self.node.y
         change = 0
         self.node.update(x=change)
-        result_x = self.node.rect.x
-        result_y = self.node.rect.y
+        result_x = self.node.x
+        result_y = self.node.y
         self.assertNotEqual(before_x, result_x)
         self.assertEqual(before_y, result_y)
         self.assertEqual(change, result_x)
         # only change y
-        before_x = self.node.rect.x
-        before_y = self.node.rect.y
+        before_x = self.node.x
+        before_y = self.node.y
         change = 5
         self.node.update(y=change)
-        result_x = self.node.rect.x
-        result_y = self.node.rect.y
+        result_x = self.node.x
+        result_y = self.node.y
         self.assertNotEqual(before_y, result_y)
         self.assertEqual(before_x, result_x)
         self.assertEqual(change, result_y)
         # change both x and y
-        before_x = self.node.rect.x
-        before_y = self.node.rect.y
+        before_x = self.node.x
+        before_y = self.node.y
         change = 15
         self.node.update(x=change, y=change)
-        result_x = self.node.rect.x
-        result_y = self.node.rect.y
+        result_x = self.node.x
+        result_y = self.node.y
         self.assertEqual(change, result_x)
         self.assertEqual(change, result_y)
 
@@ -280,9 +284,9 @@ class Test(unittest.TestCase):
 
     def testStrAndParseString(self):
         node_string = str(self.node)
-        expect = '2:x=10y=10image=cannon.pngplayer=0'
+        expect = '2:x=10y=10player=0'
         self.assertEqual(node_string, expect)
-        expect = (2, 10, 10, 'cannon.png', 0)
+        expect = (2, 10, 10, 0)
         result = self.node.parse_string(node_string)
         self.assertEqual(result, expect)
 
@@ -303,12 +307,12 @@ class Test(unittest.TestCase):
         except AssertionError:
             pass
         try:
-            self.node = Node(x=1, y=2, terrain=5, image_file=1)
+            self.node = Node(x=1, y=2, terrain=5)
             self.assertEqual(True, False, 'Exception should be thrown')
         except AssertionError:
             pass
         try:
-            self.node = Node(x=1, y=2, terrain='s', image_file='cannon.png')
+            self.node = Node(x=1, y=2, terrain='s')
             self.assertEqual(True, False, 'Exception should be thrown')
         except AssertionError:
             pass

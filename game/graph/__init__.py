@@ -273,7 +273,7 @@ class Test(unittest.TestCase):
                          'get_row_column: return invalid value')
 
     def testPaintSimple(self):
-        nodes = [Node(0, 0, 'cannon.png', GRASS)] * 9
+        nodes = [Node(0, 0, GRASS)] * 9
         node_id = 0
         for node in nodes:
             row, column = self.g.get_row_column(node_id)
@@ -287,31 +287,31 @@ class Test(unittest.TestCase):
     def testPaintPerimeterCase(self):
         self.g = Graph(5, 5)
         nodes = [
-                 [Node(0, 0, 'cannon.png', GRASS), 
-                  Node(0, 0, 'cannon.png', GRASS),
-                  Node(0, 0, 'cannon.png', GRASS),
-                  Node(0, 0, 'cannon.png', GRASS),
-                  Node(0, 0, 'cannon.png', GRASS)],
-                 [Node(0, 0, 'cannon.png', GRASS), 
-                  Node(0, 0, 'cannon.png', BLOCK),
-                  Node(0, 0, 'cannon.png', BLOCK),
-                  Node(0, 0, 'cannon.png', BLOCK),
-                  Node(0, 0, 'cannon.png', GRASS)],
-                 [Node(0, 0, 'cannon.png', GRASS), 
-                  Node(0, 0, 'cannon.png', BLOCK),
-                  Node(0, 0, 'cannon.png', GRASS),
-                  Node(0, 0, 'cannon.png', BLOCK),
-                  Node(0, 0, 'cannon.png', GRASS)],
-                 [Node(0, 0, 'cannon.png', GRASS), 
-                  Node(0, 0, 'cannon.png', BLOCK),
-                  Node(0, 0, 'cannon.png', BLOCK),
-                  Node(0, 0, 'cannon.png', BLOCK),
-                  Node(0, 0, 'cannon.png', GRASS)],
-                 [Node(0, 0, 'cannon.png', GRASS), 
-                  Node(0, 0, 'cannon.png', GRASS),
-                  Node(0, 0, 'cannon.png', GRASS),
-                  Node(0, 0, 'cannon.png', GRASS),
-                  Node(0, 0, 'cannon.png', GRASS)]
+                 [Node(0, 0, GRASS), 
+                  Node(0, 0, GRASS),
+                  Node(0, 0, GRASS),
+                  Node(0, 0, GRASS),
+                  Node(0, 0, GRASS)],
+                 [Node(0, 0, GRASS), 
+                  Node(0, 0, BLOCK),
+                  Node(0, 0, BLOCK),
+                  Node(0, 0, BLOCK),
+                  Node(0, 0, GRASS)],
+                 [Node(0, 0, GRASS), 
+                  Node(0, 0, BLOCK),
+                  Node(0, 0, GRASS),
+                  Node(0, 0, BLOCK),
+                  Node(0, 0, GRASS)],
+                 [Node(0, 0, GRASS), 
+                  Node(0, 0, BLOCK),
+                  Node(0, 0, BLOCK),
+                  Node(0, 0, BLOCK),
+                  Node(0, 0, GRASS)],
+                 [Node(0, 0, GRASS), 
+                  Node(0, 0, GRASS),
+                  Node(0, 0, GRASS),
+                  Node(0, 0, GRASS),
+                  Node(0, 0, GRASS)]
                 ]
         for row in range(0, len(nodes)):
             for column in range(0, len(nodes[row])):
@@ -329,7 +329,7 @@ class Test(unittest.TestCase):
             self.assertEqual(nodes[n].is_painted(), expect[n])
 
     def testDraw(self):
-        nodes = [Node(0, 0, 'cannon.png', GRASS)] * 9
+        nodes = [Node(0, 0, GRASS)] * 9
         node_id = 0
         for node in nodes:
             row, column = self.g.get_row_column(node_id)
@@ -338,13 +338,13 @@ class Test(unittest.TestCase):
         self.g.draw(self.screen)
 
     def testIterate(self):
-        nodes = [Node(0, 0, 'cannon.png', GRASS)] * 9
+        nodes = [Node(0, 0, GRASS)] * 9
         node_id = 0
         for node in nodes:
             row, column = self.g.get_row_column(node_id)
             self.g.set_node(row, column, node)
             node_id += 1
-        expect = '3:x=0y=0image=cannon.pngplayer=0'
+        expect = '3:x=0y=0player=0'
         count = 0
         for n in self.g.iterate():
             count += 1

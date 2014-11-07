@@ -99,10 +99,9 @@ class Level():
         Returns:
             None
         '''
-        f_name = TERRAIN_TO_FILE[terrain]
         x = x - x % NODE_SIZE
         y = y -  y % NODE_SIZE
-        n = Node(x, y, f_name, terrain, player=player)
+        n = Node(x, y, terrain, player=player)
         row = y // NODE_SIZE
         column = x // NODE_SIZE
         self.graph.set_node(row, column, n)
@@ -119,12 +118,11 @@ class Level():
             True if cannon was added
             False otherwise
         '''
-        f_name = TERRAIN_TO_FILE[CANNON]
         x = x - x % NODE_SIZE
         y = y -  y % NODE_SIZE
         add = True
         try:
-            cannon = Node(x, y, f_name, CANNON, player=player.get_id())
+            cannon = Node(x, y, CANNON, player=player.get_id())
             row = y // NODE_SIZE
             column = x // NODE_SIZE
             node = self.graph.get_node(row, column)
@@ -172,9 +170,7 @@ class Level():
                 y = row - row % NODE_SIZE
                 column = column // NODE_SIZE
                 row = row // NODE_SIZE
-                print(x, y)
                 add_node = Node(x=x, y=y,
-                                image_file=TERRAIN_TO_FILE[BLOCK],
                                 terrain=BLOCK, player=player.get_id())
                 self.graph.set_node(row, column, add_node)
         return added
