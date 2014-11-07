@@ -28,7 +28,9 @@ O_GRASS_NORMAL = 'grass-odd.png'
 E_GRASS_NORMAL = 'grass-even.png'
 I_GRASS_DESTROYED = 'grass.png'
 I_GRASS_PAINTED = "grass.png"
-I_WATER = 'sea.png'
+O_WATER = 'sea-odd.png'
+E_WATER = 'sea-even.png'
+
 I_WALL = 'wall.png'
 I_CASTLE = 'castle.png'
 I_CASTLE_1 = 'castle_1.png'
@@ -55,7 +57,7 @@ TERRAIN_TO_FILE = {CANNON: [[I_CANNON]],
                            [E_GRASS_NORMAL, O_GRASS_NORMAL], 
                            [I_GRASS_DESTROYED], [I_GRASS_PAINTED]
                           ],
-                   WATER: [[I_WATER]],
+                   WATER: [[E_WATER, O_WATER]],
                    CASTLE: [[I_CASTLE]],
                    WALL: [[I_WALL]]
                   }
