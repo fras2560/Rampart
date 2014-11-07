@@ -1,4 +1,4 @@
 3X3
-3:x=0y=0image=grass.pngplayer=0,3:x=0y=0image=grass.pngplayer=0,3:x=0y=0image=grass.pngplayer=0
-3:x=0y=0image=grass.pngplayer=0,3:x=0y=0image=grass.pngplayer=0,3:x=0y=0image=grass.pngplayer=0
-3:x=0y=0image=grass.pngplayer=0,3:x=0y=0image=grass.pngplayer=0,3:x=0y=0image=grass.pngplayer=0
+3:x=0y=0player=0,3:x=0y=0player=0,3:x=0y=0player=0
+3:x=0y=0player=0,3:x=0y=0player=0,3:x=0y=0player=0
+3:x=0y=0player=0,3:x=0y=0player=0,3:x=0y=0player=0
