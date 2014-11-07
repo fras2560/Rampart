@@ -8,11 +8,9 @@
 import pygame
 from rampart.level import Level
 from rampart.player import Player
-from graph.node import Node
-from cursor import Cursor
 from point import Point
 from color import Color
-from config import  DOWN, UP, LEFT, RIGHT, BASE, NODE_SIZE, CANNON
+from config import  DOWN, UP, LEFT, RIGHT, BASE
 SIZE = (500,500)
 class Tester():
     def __init__(self):
@@ -43,7 +41,7 @@ class Tester():
                 if event.type == pygame.QUIT:
                     done = True
                 if event.type == pygame.MOUSEBUTTONDOWN:
-                    pos = pygame.mouse.get_pos()
+                    __ = pygame.mouse.get_pos()
                 if event.type == pygame.KEYDOWN:
                     key = pygame.key.get_pressed()
                     if key[pygame.K_SPACE]:
