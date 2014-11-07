@@ -168,9 +168,12 @@ class Level():
             for point in piece.return_points():
                 column = point[0]
                 row = point[1]
+                x = column - column % NODE_SIZE
+                y = row - row % NODE_SIZE
                 column = column // NODE_SIZE
                 row = row // NODE_SIZE
-                add_node = Node(x=column, y=row,
+                print(x, y)
+                add_node = Node(x=x, y=y,
                                 image_file=TERRAIN_TO_FILE[BLOCK],
                                 terrain=BLOCK, player=player.get_id())
                 self.graph.set_node(row, column, add_node)
