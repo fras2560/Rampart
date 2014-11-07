@@ -75,6 +75,9 @@ class Graph():
         '''
         assert row >= 0, 'Graph->get_node_id: invalid row index (<0)'
         assert column >= 0, 'Graph->get_node_id: invalid column index (<0)'
+        assert row < self.rows, 'Graph->get_node_id: invalid row index (>bound)'
+        m = 'Graph->get_node_id: invalid column index (>bound)'
+        assert column < self.columns, m
         node_id = column + self.columns * row
         return node_id
 
@@ -228,6 +231,18 @@ class Test(unittest.TestCase):
             self.g.get_node_id(0, -1)
             self.assertEqual(True, False,
                              'get_node_id should raise exception (y<0)')
+        except AssertionError:
+            pass
+        try:
+            self.g.get_node_id(0, 3)
+            self.assertEqual(True, False,
+                             'get_node_id should raise exception (x>row)')
+        except AssertionError:
+            pass
+        try:
+            self.g.get_node_id(3, 0)
+            self.assertEqual(True, False,
+                             'get_node_id should raise exception (y>column)')
         except AssertionError:
             pass
         node_id = self.g.get_node_id(0, 0)
