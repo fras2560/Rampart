@@ -9,7 +9,7 @@
 import logging
 from graph import Graph
 from graph.node import Node
-from rampart.config import TERRAIN_TO_FILE, NODE_SIZE, CANNON, CANBUILD, BLOCK
+from rampart.config import NODE_SIZE, CANNON, CANBUILD, BLOCK
 class Level():
     def __init__(self, file_path, logger=None):
         if logger is None:
