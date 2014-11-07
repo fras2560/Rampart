@@ -30,6 +30,7 @@ class Tester():
         self.clock = pygame.time.Clock()
         self.speed = 1
         self.level = Level(BASE)
+        self.level.update()
         self.player = Player(1, self.center)
 
     def main(self):
@@ -58,6 +59,7 @@ class Tester():
                         self.player.piece.counter_clockwise_turn()
                     if key[pygame.K_s]:
                         self.player.piece.clockwise_turn()
+            self.level.update()
             self.screen.fill(self.color.white)
             self.player.update()
             self.level.draw(self.screen)

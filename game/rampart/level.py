@@ -10,6 +10,8 @@ import logging
 from graph import Graph
 from graph.node import Node
 from rampart.config import NODE_SIZE, CANNON, CANBUILD, BLOCK
+import sys
+
 class Level():
     def __init__(self, file_path, logger=None):
         if logger is None:
@@ -40,6 +42,7 @@ class Level():
                         c += 1
                 r += 1
         self.logger.info("Done loading level")
+        sys.setrecursionlimit(self.graph.columns * self.graph.rows)
 
     def save(self, file_path):
         '''
@@ -174,6 +177,9 @@ class Level():
                                 terrain=BLOCK, player=player.get_id())
                 self.graph.set_node(row, column, add_node)
         return added
+
+    def update(self):
+        self.graph.paint()
 
 import unittest
 import os
