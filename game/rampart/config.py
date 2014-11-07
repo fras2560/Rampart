@@ -24,7 +24,8 @@ SHOOTING = 1
 list of assets Images
 '''
 I_CANNON = 'cannon.png'
-I_GRASS_NORMAL = 'grass.png'
+O_GRASS_NORMAL = 'grass-odd.png'
+E_GRASS_NORMAL = 'grass-even.png'
 I_GRASS_DESTROYED = 'grass.png'
 I_GRASS_PAINTED = "grass.png"
 I_WATER = 'sea.png'
@@ -48,12 +49,15 @@ CASTLE = 6
 PAINTED = 1
 TERRAIN = 10 #terrain size
 TYPES = [BLOCK, CANNON, GRASS, WATER, WALL, CASTLE]
-TERRAIN_TO_FILE = {CANNON: [I_CANNON],
-                   BLOCK: [I_BLOCK],
-                   GRASS: [I_GRASS_NORMAL, I_GRASS_DESTROYED, I_GRASS_PAINTED],
-                   WATER: [I_WATER],
-                   CASTLE: [I_CASTLE],
-                   WALL: [I_WALL]
+TERRAIN_TO_FILE = {CANNON: [[I_CANNON]],
+                   BLOCK: [[I_BLOCK]],
+                   GRASS: [
+                           [E_GRASS_NORMAL, O_GRASS_NORMAL], 
+                           [I_GRASS_DESTROYED], [I_GRASS_PAINTED]
+                          ],
+                   WATER: [[I_WATER]],
+                   CASTLE: [[I_CASTLE]],
+                   WALL: [[I_WALL]]
                   }
 
 CANBUILD = [GRASS]
