@@ -116,16 +116,26 @@ class Level():
             y: the y position (int)
             player: the player cannon (player)
         Returns:
-            None
+            True if cannon was added
+            False otherwise
         '''
         f_name = TERRAIN_TO_FILE[CANNON]
         x = x - x % NODE_SIZE
         y = y -  y % NODE_SIZE
-        cannon = Node(x, y, f_name, CANNON, player=player.get_id())
-        row = y // NODE_SIZE
-        column = x // NODE_SIZE
-        self.graph.set_node(row, column, cannon)
-        player.add_cannon(cannon)
+        add = True
+        try:
+            cannon = Node(x, y, f_name, CANNON, player=player.get_id())
+            row = y // NODE_SIZE
+            column = x // NODE_SIZE
+            node = self.graph.get_node(row, column)
+            if node.get_type() not in CANBUILD:
+                add = False
+        except:
+            add = False
+        if add:
+            self.graph.set_node(row, column, cannon)
+            player.add_cannon(cannon)
+        return add
 
     def add_piece(self, player):
         '''
@@ -142,21 +152,27 @@ class Level():
         for point in piece.return_points():
             column = point[0] 
             row = point[1]
-            column = column - column % NODE_SIZE
-            row = row - row % NODE_SIZE
-            node = self.graph.get_node_id(row, column)
-            if node.get_type() not in CANBUILD:
+            column = column // NODE_SIZE
+            row = row // NODE_SIZE
+            try:
+                node = self.graph.get_node(row, column)
+                if node.get_type() not in CANBUILD:
+                    valid = False
+                    break
+            except AssertionError:
                 valid = False
                 break
+        self.logger.debug(" Able to add piece: %s" % valid)
         if valid:
             added = True
             for point in piece.return_points():
                 column = point[0]
                 row = point[1]
-                column = column - column % NODE_SIZE
-                row = row - row % NODE_SIZE
-                add_node = Node(x=column, y=row, image_file=TERRAIN_TO_FILE[BLOCK],
-                                player=player.get_id())
+                column = column // NODE_SIZE
+                row = row // NODE_SIZE
+                add_node = Node(x=column, y=row,
+                                image_file=TERRAIN_TO_FILE[BLOCK],
+                                terrain=BLOCK, player=player.get_id())
                 self.graph.set_node(row, column, add_node)
         return added
 
@@ -164,18 +180,21 @@ import unittest
 import os
 import pygame
 from rampart.config import WATER
+from rampart.player import Player
+from rampart.piece import Piece
+
 class Test(unittest.TestCase):
 
     def setUp(self):
         logging.basicConfig(level=logging.DEBUG,
                             format='%(asctime)s %(message)s')
-        logger = logging.getLogger(__name__)
+        self.logger = logging.getLogger(__name__)
         directory = os.path.dirname(os.getcwd())
         self.directory = os.path.join(directory, 'levels')
         self.fp = os.path.join(self.directory, 'test.txt')
         pygame.init()
         self.screen = pygame.display.set_mode((200, 200))
-        self.level = Level(self.fp, logger=logger)
+        self.level = Level(self.fp, logger=self.logger)
         self.fp_save = os.path.join(self.directory, 'output.txt')
 
     def tearDown(self):
@@ -205,6 +224,56 @@ class Test(unittest.TestCase):
         self.level.update_node(0, 10, WATER)
         result = self.level.graph.get_node(1, 0).get_type()
         self.assertEqual(result, WATER)
+
+    def testAddPieceSimple(self):
+        piece = Piece()
+        piece._O_piece()
+        player = Player()
+        player.piece = piece
+        added = self.level.add_piece(player)
+        self.assertEqual(added, True)
+        added = self.level.add_piece(player)
+        self.assertEqual(added, False)
+
+    def testAddPiece(self):
+        fp = os.path.join(self.directory, "piece-test.txt")
+        self.level = Level(fp, logger=self.logger)
+        piece = Piece()
+        player = Player()
+        piece._O_piece()
+        player.piece = piece
+        added = self.level.add_piece(player)
+        self.assertEqual(added, True)
+        piece.translate(NODE_SIZE, 0)
+        added = self.level.add_piece(player)
+        self.assertEqual(added, False)
+        self.level.add_cannon(2*NODE_SIZE, 2*NODE_SIZE, player)
+        piece.translate(0, NODE_SIZE)
+        added = self.level.add_piece(player)
+        self.assertEqual(added, False)
+        piece.translate(NODE_SIZE, NODE_SIZE)
+        added = self.level.add_piece(player)
+        self.assertEqual(added, False)
+        piece.translate(NODE_SIZE, NODE_SIZE)
+        added = self.level.add_piece(player)
+        self.assertEqual(added, True)
+
+    def testAddCannon(self):
+        player = Player()
+        added = self.level.add_cannon(-10, -10, player)
+        self.assertEqual(added, False)
+        added = self.level.add_cannon(0, -10, player)
+        self.assertEqual(added, False)
+        added = self.level.add_cannon(-10, 0, player)
+        self.assertEqual(added, False)
+        added = self.level.add_cannon(300, 0, player)
+        self.assertEqual(added, False)
+        added = self.level.add_cannon(0, 300, player)
+        self.assertEqual(added, False)
+        added = self.level.add_cannon(0, 0, player)
+        self.assertEqual(added, True)
+        added = self.level.add_cannon(0, 0, player)
+        self.assertEqual(added, False)
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
