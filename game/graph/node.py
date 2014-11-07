@@ -14,7 +14,7 @@ Imports
 import pygame
 from rampart.helper import file_path
 from rampart.config import TERRAIN, TYPES, NONPLAYER, TERRAIN_TO_FILE
-from rampart.config import NORMAL, NODE_SIZE
+from rampart.config import NORMAL, NODE_SIZE, UNPAINTED, DESTROYED
 from rampart.color import Color
 import logging
 
@@ -146,8 +146,13 @@ class Node(pygame.sprite.Sprite):
         surface_blit = surface.blit
         row = self.x // NODE_SIZE
         column = self.y // NODE_SIZE
+        if self.painted:
+            self.state = NORMAL
+        else:
+            if self.state != DESTROYED:
+                self.state = UNPAINTED
         odd = (row % 2 + column) % 2
-        if odd == 1 and len(self.rects[self.state]) <= 1:
+        if odd == 1 and len(self.rects[self.state]) < 2:
             odd = 0
         self.rects[self.state][odd].x = self.x
         self.rects[self.state][odd].y = self.y

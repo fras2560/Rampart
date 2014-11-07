@@ -27,7 +27,8 @@ I_CANNON = 'cannon.png'
 O_GRASS_NORMAL = 'grass-odd.png'
 E_GRASS_NORMAL = 'grass-even.png'
 I_GRASS_DESTROYED = 'grass.png'
-I_GRASS_PAINTED = "grass.png"
+E_GRASS_UNPAINTED = "territory-even.png"
+O_GRASS_UNPAINTED = "territory-odd.png"
 O_WATER = 'sea-odd.png'
 E_WATER = 'sea-even.png'
 
@@ -51,15 +52,36 @@ CASTLE = 6
 PAINTED = 1
 TERRAIN = 10 #terrain size
 TYPES = [BLOCK, CANNON, GRASS, WATER, WALL, CASTLE]
-TERRAIN_TO_FILE = {CANNON: [[I_CANNON]],
-                   BLOCK: [[I_BLOCK]],
+TERRAIN_TO_FILE = {CANNON: [
+                            [I_CANNON],
+                            [I_CANNON],
+                            [I_CANNON]
+                            ],
+                   BLOCK: [
+                           [I_BLOCK],
+                           [I_BLOCK],
+                           [I_BLOCK]
+                           ],
                    GRASS: [
                            [E_GRASS_NORMAL, O_GRASS_NORMAL], 
-                           [I_GRASS_DESTROYED], [I_GRASS_PAINTED]
+                           [I_GRASS_DESTROYED],
+                           [E_GRASS_UNPAINTED, O_GRASS_UNPAINTED]
                           ],
-                   WATER: [[E_WATER, O_WATER]],
-                   CASTLE: [[I_CASTLE]],
-                   WALL: [[I_WALL]]
+                   WATER: [
+                           [E_WATER, O_WATER],
+                           [E_WATER, O_WATER],
+                           [E_WATER, O_WATER]
+                          ],
+                   CASTLE: [
+                            [I_CASTLE],
+                            [I_CASTLE],
+                            [I_CASTLE]
+                           ],
+                   WALL: [
+                          [I_WALL],
+                          [I_WALL],
+                          [I_WALL]
+                         ]
                   }
 
 CANBUILD = [GRASS]
@@ -70,7 +92,7 @@ PICTURE INDEXES
 '''
 NORMAL = 0
 DESTROYED = 1
-PAINTED = 2
+UNPAINTED = 2
 '''
 Player constants
 '''
