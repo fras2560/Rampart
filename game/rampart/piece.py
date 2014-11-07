@@ -123,7 +123,7 @@ class Piece():
         '''
         self.points.append([[0],[0]])
         self.points.append([[0],[-NODE_SIZE]])
-        self.points.append([[1],[-NODE_SIZE]])
+        self.points.append([[NODE_SIZE],[-NODE_SIZE]])
         self.points.append([[-NODE_SIZE],[0]])
 
     def _S_piece(self):
