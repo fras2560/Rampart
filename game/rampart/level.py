@@ -9,17 +9,20 @@
 import logging
 from graph import Graph
 from graph.node import Node
-from rampart.config import NODE_SIZE, CANNON, CANBUILD, BLOCK
+from rampart.config import NODE_SIZE, CANNON, CANBUILD, BLOCK, TERRAIN_TO_FILE
+from rampart.config import BACKGROUND
+from graph.terrain import Terrain
 import sys
 
 class Level():
-    def __init__(self, file_path, logger=None):
+    def __init__(self, file_path, logger=None, testing=False):
         if logger is None:
             logging.basicConfig(level=logging.INFO,
                             format='%(asctime)s %(message)s')
             logger = logging.getLogger(__name__)
         self.logger=logger
         self.logger.info("Loading Level" )
+        self.terrain = Terrain(TERRAIN_TO_FILE, NODE_SIZE, BACKGROUND)
         with open(file_path) as f:
             lines = f.read().split("\n")
             dimensions = lines[0]
@@ -37,12 +40,15 @@ class Level():
                     assert cond2, 'File has mismatching dimensions'
                     c = 0
                     for node in nodes:
-                        self.graph.set_node(r, c,
-                                            Node(string_object=node, logger=self.logger))
+                        n = Node(string_object=node,
+                                  images=self.terrain,
+                                  logger=self.logger)
+                        self.graph.set_node(r, c, n)
                         c += 1
                 r += 1
         self.logger.info("Done loading level")
-        sys.setrecursionlimit(self.graph.columns * self.graph.rows)
+        if not testing:
+            sys.setrecursionlimit(self.graph.columns * self.graph.rows)
 
     def save(self, file_path):
         '''
@@ -104,7 +110,7 @@ class Level():
         '''
         x = x - x % NODE_SIZE
         y = y -  y % NODE_SIZE
-        n = Node(x, y, terrain, player=player)
+        n = Node(x=x, y=y, terrain=terrain, player=player, images=self.terrain)
         row = y // NODE_SIZE
         column = x // NODE_SIZE
         self.graph.set_node(row, column, n)
@@ -125,7 +131,8 @@ class Level():
         y = y -  y % NODE_SIZE
         add = True
         try:
-            cannon = Node(x, y, CANNON, player=player.get_id())
+            cannon = Node(x=x, y=y, terrain=CANNON,
+                          images=self.terrain,player=player.get_id())
             row = y // NODE_SIZE
             column = x // NODE_SIZE
             node = self.graph.get_node(row, column)
@@ -173,8 +180,8 @@ class Level():
                 y = row - row % NODE_SIZE
                 column = column // NODE_SIZE
                 row = row // NODE_SIZE
-                add_node = Node(x=x, y=y,
-                                terrain=BLOCK, player=player.get_id())
+                add_node = Node(x=x, y=y, terrain=BLOCK,
+                                images=self.terrain, player=player.get_id())
                 self.graph.set_node(row, column, add_node)
         return added
 
@@ -199,7 +206,7 @@ class Test(unittest.TestCase):
         self.fp = os.path.join(self.directory, 'test.txt')
         pygame.init()
         self.screen = pygame.display.set_mode((200, 200))
-        self.level = Level(self.fp, logger=self.logger)
+        self.level = Level(self.fp, logger=self.logger, testing=True)
         self.fp_save = os.path.join(self.directory, 'output.txt')
 
     def tearDown(self):
@@ -211,7 +218,7 @@ class Test(unittest.TestCase):
 
     def testSave(self):
         self.level.save(self.fp_save)
-        self.level = Level(self.fp_save)
+        self.level = Level(self.fp_save, testing=True)
 
     def testParseDimensions(self):
         dimensions = '3X4'
@@ -242,7 +249,7 @@ class Test(unittest.TestCase):
 
     def testAddPiece(self):
         fp = os.path.join(self.directory, "piece-test.txt")
-        self.level = Level(fp, logger=self.logger)
+        self.level = Level(fp, logger=self.logger, testing=True)
         piece = Piece()
         player = Player()
         piece._O_piece()
@@ -281,5 +288,4 @@ class Test(unittest.TestCase):
         self.assertEqual(added, False)
 
 if __name__ == "__main__":
-    #import sys;sys.argv = ['', 'Test.testName']
     unittest.main()
