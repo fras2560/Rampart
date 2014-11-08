@@ -72,7 +72,7 @@ class Node(pygame.sprite.Sprite):
         self.x = x
         self.y = y
         self.type = terrain
-        self.painted = False
+        self.painted = True
         self.state = NORMAL
         if player is None:
             player = NONPLAYER
