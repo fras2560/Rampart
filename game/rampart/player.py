@@ -35,7 +35,7 @@ class Player():
         self.lives = LIVES
         if iid is None:
             iid = 1
-        self.id = id
+        self.id = iid
         self.cursor = Cursor()
         if point is None:
             point = Point()

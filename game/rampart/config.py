@@ -60,13 +60,13 @@ E_WATER = 'sea-even.png'
 O_EXTERIOR = "exterior-odd.png"
 E_EXTERIOR = "exterior-even.png"
 I_WALL = 'wall.png'
-I_CASTLE = 'castle.png'
+I_CASTLE = 'castle1.png'
 I_CASTLE_1 = 'castle_1.png'
 I_CASTLE_2 = 'castle_2.png'
 I_CASTLE_3 = 'castle_3.png'
 I_BLOCK = 'wall.png'
 BASE = os.path.join(os.path.dirname(os.getcwd()),'levels', 'base.txt')
-
+CASTLE_SPOTS= [(0, 0), (0,1), (1, 0), (1,1)]
 '''
 Node Types, Constants, and Indexes
 '''
@@ -83,6 +83,7 @@ NODE_SIZE = 10
 NORMAL = 0
 DESTROYED = 1
 UNPAINTED = 2
+CANBUILD = [GRASS]
 TYPES = [BLOCK, CANNON, GRASS, WATER, WALL, CASTLE, EXTERIOR]
 # dict holds terrain and list of images
 TERRAIN_TO_FILE = {CANNON: [

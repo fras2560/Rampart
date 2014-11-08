@@ -6,6 +6,7 @@
 @note: This class is used to test Matrix and piece manually
 '''
 from rampart.level import Level
+from rampart.player import Player
 import pygame
 from rampart.config import WATER, GRASS, CASTLE, NODE_SIZE, BASE
 from rampart.color import Color
@@ -29,7 +30,9 @@ class Tester():
         self.level = Level(BASE)
         self.done = False
         self.selected = 0
-        self.player = 0
+        self.players = [Player(iid=1, color=self.color.blue),
+                        Player(iid=2, color=self.color.red)]
+        self.player = self.players[0]
         self.save = os.path.join(os.path.dirname(BASE), 'output.txt')
 
     def display_options(self):
@@ -60,13 +63,9 @@ class Tester():
         label = self.point.render("Press s to Save to File", 1, self.color.black)
         self.screen.blit(label,(SIZE[0] - MARGIN, y*LINE))
         y += 1
-        if self.player > 0:
-            output = "Current selected player" + str(self.player)
-            label = self.point.render(output, 1, self.color.black)
-            self.screen.blit(label,(SIZE[0] - MARGIN,y*LINE))
-        else:
-            label = self.point.render("No selected player", 1, self.color.black)
-            self.screen.blit(label,(SIZE[0] - MARGIN, y*LINE))
+        output = "Current selected player: " + str(self.player.get_id())
+        label = self.point.render(output, 1, self.color.black)
+        self.screen.blit(label,(SIZE[0] - MARGIN,y*LINE))
         y += 1
 
     def main(self):
@@ -83,9 +82,9 @@ class Tester():
                     if key[pygame.K_c]:
                         self.selected = CASTLE
                     if key[pygame.K_1]:
-                        self.player = 1
+                        self.player = self.players[0]
                     if key[pygame.K_2]:
-                        self.player = 2
+                        self.player = self.players[1]
                     if key[pygame.K_s]:
                         self.level.save(self.save)
                 if event.type == pygame.MOUSEBUTTONDOWN:
@@ -93,17 +92,17 @@ class Tester():
                     x = pos[0]
                     y = pos[1]
                     if x < SIZE[0] - MARGIN and self.selected > 0:
-                         
-                        if self.selected != CASTLE:
-                            ratio = 1
+                        if self.selected == CASTLE:
+                            self.level.add_castle(x, y, self.player)
+                            print("added castle")
                         else:
                             ratio = 2
-                        x1 = x < SIZE[0] - MARGIN - (ratio+1) * NODE_SIZE
-                        xcond =  x1 and x > ratio * NODE_SIZE
-                        y1 = y < SIZE[1] - ratio * NODE_SIZE 
-                        ycond = y > ratio * NODE_SIZE and  y1
-                        if ycond and xcond:
-                            self.level.update_node(x, y, self.selected)
+                            x1 = x < SIZE[0] - MARGIN - (ratio+1) * NODE_SIZE
+                            xcond =  x1 and x > ratio * NODE_SIZE
+                            y1 = y < SIZE[1] - ratio * NODE_SIZE 
+                            ycond = y > ratio * NODE_SIZE and  y1
+                            if ycond and xcond:
+                                self.level.update_node(x, y, self.selected)
             self.screen.fill(self.color.white)
             self.display_options()
             self.level.draw(self.screen)

@@ -10,7 +10,7 @@ import logging
 from graph import Graph
 from graph.node import Node
 from rampart.config import NODE_SIZE, CANNON, CANBUILD, BLOCK, TERRAIN_TO_FILE
-from rampart.config import BACKGROUND
+from rampart.config import BACKGROUND, CASTLE
 from graph.terrain import Terrain
 import sys
 
@@ -110,11 +110,62 @@ class Level():
         '''
         x = x - x % NODE_SIZE
         y = y -  y % NODE_SIZE
+        if player is not None:
+            player = player.get_id()
         n = Node(x=x, y=y, terrain=terrain, player=player, images=self.terrain)
         row = y // NODE_SIZE
         column = x // NODE_SIZE
         self.graph.set_node(row, column, n)
         return
+
+    def add_castle(self, x, y, player):
+        '''
+        a method to add a castle
+        Parameters:
+            x: the position (int)
+            y: the y position (int)
+            player: the player who the castle belongs to (player)
+        Returns:
+            added: True if able to add castle False otherwise (boolean)
+        '''
+        x = x - x % NODE_SIZE
+        y = y -y % NODE_SIZE
+        row = x // NODE_SIZE
+        column = y // NODE_SIZE
+        added = False
+        row_cond = row > 2 and row < self.rows - 2
+        col_cond = column > 2 and column > self.columns - 2
+        outer_edge = row_cond and col_cond
+        if player is not None:
+            player = player.get_id()
+        if outer_edge and self.check_castle(row, column):
+            for (r, c) in castle_spot(row, column):
+                node = Node(x=x, y=y, terrain=CASTLE,
+                            player=player, images=self.terrain)
+                self.graph.set_node(r, c, node)
+        return added
+
+    def check_castle(self, row, column):
+        '''
+        a method to check if can add the castle to that spot
+        Parameters:
+            row: the row index (int)
+            column: the column index (int)
+        Return:
+            valid: True if castle is valid, False otherwise (boolean)
+        '''
+        valid = True
+        for (r,c) in castle_spot(row, column):
+            try:
+                node_id = self.graph.get_node_id(r, c)
+                if not self.graph.available(node_id):
+                    valid = False
+            except:
+                self.logger.debug("Invalid node id")
+                valid = False
+            if not valid:
+                break
+        return valid
 
     def add_cannon(self, x, y, player):
         '''
@@ -187,6 +238,11 @@ class Level():
 
     def update(self):
         self.graph.paint()
+
+from rampart.config import CASTLE_SPOTS
+def castle_spot(row, column):
+    for (r,c) in CASTLE_SPOTS:
+        yield (row+r, column+c)
 
 import unittest
 import os
@@ -286,6 +342,18 @@ class Test(unittest.TestCase):
         self.assertEqual(added, True)
         added = self.level.add_cannon(0, 0, player)
         self.assertEqual(added, False)
+
+    def testCheckCastle(self):
+        result = self.level.check_castle(0, 0)
+        self.assertEqual(result, True)
+        self.level.update_node(0, 0, BLOCK)
+        result = self.level.check_castle(0, 0)
+        self.assertEqual(result, False)
+        self.level.update_node(10, 0, WATER)
+        result = self.level.check_castle(0, 2)
+        self.assertEqual(result, False)
+        result = self.level.check_castle(2, 2)
+        self.assertEqual(result, False)
 
 if __name__ == "__main__":
     unittest.main()
