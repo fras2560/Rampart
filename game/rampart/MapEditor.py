@@ -93,14 +93,17 @@ class Tester():
                     x = pos[0]
                     y = pos[1]
                     if x < SIZE[0] - MARGIN and self.selected > 0:
+                         
                         if self.selected != CASTLE:
-                            self.level.update_node(x, y, self.selected)
+                            ratio = 1
                         else:
-                            x1 = x < SIZE[0] - MARGIN - 2 * NODE_SIZE
-                            xcond =  x1 and x > NODE_SIZE
-                            ycond = y > NODE_SIZE and y < SIZE[1] - NODE_SIZE 
-                            if ycond and xcond:
-                                self.level.update_node(x, y, self.selected)
+                            ratio = 2
+                        x1 = x < SIZE[0] - MARGIN - (ratio+1) * NODE_SIZE
+                        xcond =  x1 and x > ratio * NODE_SIZE
+                        y1 = y < SIZE[1] - ratio * NODE_SIZE 
+                        ycond = y > ratio * NODE_SIZE and  y1
+                        if ycond and xcond:
+                            self.level.update_node(x, y, self.selected)
             self.screen.fill(self.color.white)
             self.display_options()
             self.level.draw(self.screen)
