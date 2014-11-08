@@ -14,6 +14,117 @@ import pygame
 import helper
 from config import  GRAVITY
 
+class Bezier():
+    def __init__(self):
+        self.points = []
+        self.coeffs = []
+
+    def reset(self):
+        '''
+        a method to reset the bezier curve
+        Parameters:
+            None
+        Returns:
+            None
+        '''
+        del self.points
+        del self.coeffs
+        self.points = []
+        self.coeffs = []
+
+    def add_point(self,point):
+        '''
+        a method to add a control point
+        Parameters:
+            point: the point to add (Point)
+        Returns:
+            None
+        '''
+        self.points.append(point)
+
+    def set_coeffs(self):
+        '''
+        a method that set the coefficients for the blending function
+        Parameters:
+            None
+        Returns:
+            None
+        '''
+        n = len(self.points) - 1
+        self.coeffs = []
+        for k in range(n + 1):
+            self.coeffs.append(1)
+            j = n
+            while j >= k + 1:
+                self.coeffs[k] *= j
+                j -= 1
+            j= n - k
+            while j >= 2:
+                self.coeffs[k] /=j
+                j -= 1
+
+    def get_point(self, u):
+        '''
+        a method that calculate the bezier point
+        Parameters:
+            u: the value of u for blending function (p1=0<=u<=1.0=pn) (float)
+        Returns:
+            point: an object with the x and  position (Point)
+        '''
+        control_points = len(self.points)
+        n = control_points - 1
+        point = Point()
+        point.set(x=0, y=0)
+        k = 0
+        while k < control_points:
+            blend_function = self.coeffs[k] * math.pow(u, k) * math.pow(1-u,
+                                                                        n-k)
+            (x, y) = self.points[k].get()
+            (xi, yi) = point.get()
+            point.set(x=xi + x * blend_function, y=yi + y * blend_function)
+            k += 1
+        return point 
+
+class TestBezier(unittest.TestCase):
+    def setUp(self):
+        self.b = Bezier()
+        
+    def tearDown(self):
+        pass
+
+    def test_add_point(self):
+        self.assertEqual(self.b.points, [])
+        p = Point()
+        p.set(x=1,y=1)
+        self.b.add_point(p)
+        self.assertEqual([p], self.b.points)
+
+    def test_set_coeffs(self):
+        p1 = Point().set(x=1, y=1)
+        p2 = Point().set(x=2, y=2)
+        p3 = Point().set(x=3, y=1)
+        self.b.points = [p1, p2, p3]
+        self.b.set_coeffs()
+        self.assertEqual(self.b.coeffs,[1, 2, 1])
+
+    def test_get_point(self):
+        p1 = Point()
+        p1.set(x=1, y=1)
+        p2 = Point()
+        p2.set(x=2, y=2)
+        p3 = Point()
+        p3.set(x=3, y=1)
+        self.b.coeffs = [1, 3, 1]
+        self.b.points = [p1,p2,p3]
+        u = 0
+        x = 0
+        n = len(self.b.points)
+        p = Point()
+        p.set(x=0, y=0)
+        while x <= n:
+            u = x / float(n)
+            p = self.b.get_point(u)
+            x += 1
 
 class Equation():
     def __init__(self):
@@ -26,22 +137,21 @@ class Equation():
         vertical: True if movement is only vertical False otherwise
         g: the gravity constant
         '''
-        self.velocity = 0
-        self.y0 = 0
-        self.time = 0
+        self.bezier = Bezier()
+        self.u = 0
         self.step = 0
-        self.x0 = 0
-        self.vertical = False
-        self.g = GRAVITY
+        self.tol = 10
+        self.done = False
 
     def reset(self):
         '''
-        a function to reset the equation
+        a method to reset the equation
         Parameters:
             None
         Returns:
             None
         '''
+        self.bezier.reset()
         self.velocity = 0
         self.y0 = 0
         self.time = 0
@@ -50,9 +160,9 @@ class Equation():
         self.vertical = False
         self.g = GRAVITY
         
-    def set(self,p1,p2):
+    def set(self,p1, p2):
         '''
-        a function that set the equation using the two points given
+        a method that set the equation using the two points given
         Parameters:
             p1: the first point or initial release point (Point)
             p2: the second point or target point (Point)
@@ -61,44 +171,40 @@ class Equation():
         '''
         (x1,y1) = p1.get()
         (x2,y2) = p2.get()
-        dx = x2 - x1
-        _dy = y2 - y1
-        self.y0 = y1
-        self.x0 = x1
-        top = float(y2) + 0.5*self.g * float(dx)*float(dx) - float(self.y0)
-        self.velocity = top / float(dx)
-        self.vertical  = False
-        self.time = 0
-        if dx < 0:
-            #moving left
-            self.step = -(1)
-        elif dx > 0:
-            #moving right
-            self.step = (1)
+        dx = math.fabs(x1 - x2)
+        dy = math.fabs(y1 - y2)
+        euclidean = math.sqrt(dx*dx+dy*dy)
+        if (dx < self.tol and dx < dy/2):
+            mid_y = (y1+y2) / 2
+            mid_x = min(x1,x2) + euclidean
         else:
-            #just up/down
-            self.step = (1)
-            self.vertical = True
-        return
+            #more vertical, more arc
+            mid_x = (x1 + x2) / 2
+            mid_y = min(y1,y2) + euclidean
+        #set the the step size
+        self.step = 1 / float(euclidean)
+        # add the three points
+        self.bezier.add_point(p1)
+        pmid = Point()
+        pmid.set(mid_x, mid_y)
+        self.bezier.add_point(pmid)
+        self.bezier.add_point(p2)
+        self.bezier.set_coeffs()
+        return 
 
     def get(self):
         '''
-            a function that gets the current position of the equation
-            Parameters:
-                None:
-            Returns:
-                point: the current point (Point)
+        a method that gets the current position of the equation
+        Parameters:
+            None:
+        Returns:
+            point: the current point (Point)
         '''
-        t = self.time
-        height = (-0.5*self.g*t*t + self.velocity*t + 
-                  float(self.y0)) 
-        point = Point()
-        if not self.vertical:
-            point.set(x=self.time+self.x0,y=height)
-        else:
-            point.set(x=self.x0,y=height)
-        self.time += self.step
-        return point
+        p = self.bezier.get_point(self.u)
+        self.u += self.step
+        if(self.u >= 1.0):
+            self.done = True
+        return p
 
 '''
 Currently no test for equation since it depends on GRAVITY constant
@@ -134,7 +240,7 @@ class Cannonball(pygame.sprite.Sprite):
 
     def reset(self):
         '''
-        a function that resets the Cannonball
+        a method that resets the Cannonball
         Parameters:
             None
         Returns:
@@ -150,13 +256,12 @@ class Cannonball(pygame.sprite.Sprite):
 
     def set(self, p1, p2):
         '''
-            a function that two sets of points for the cannon ball path
-            Parameters:
-                p1: a tuple of the point (x,y)
-                p2: a tuple of the second point (x2,y2)
-            Returns:
-                None
-                        
+        a method that two sets of points for the cannon ball path
+        Parameters:
+            p1: a tuple of the point (x,y)
+            p2: a tuple of the second point (x2,y2)
+        Returns:
+            None
         '''
         self.equation.set(p1,p2)
         self.end = p2
@@ -169,7 +274,7 @@ class Cannonball(pygame.sprite.Sprite):
         
     def in_air(self):
         '''
-        a function that checks if the cannon ball is  in the air or not
+        a method that checks if the cannon ball is  in the air or not
         Parameters:
             None
         Returns:
@@ -179,7 +284,7 @@ class Cannonball(pygame.sprite.Sprite):
 
     def increment(self):
         '''
-        a function that moves the position of the cannonball
+        a method that moves the position of the cannonball
         and determines if the cannonball has reached the end position
         Parameters:
             None
@@ -199,7 +304,7 @@ class Cannonball(pygame.sprite.Sprite):
 
     def past_end(self, a, b, direction):
         '''
-        a function that checks if the a (point) is past the b point
+        a method that checks if the a (point) is past the b point
         Parameters:
             a: the x coordinate of point
             b: the x coordinate of the second point
@@ -219,7 +324,7 @@ class Cannonball(pygame.sprite.Sprite):
     
     def get(self):
         '''
-        a function that gets position of the cannonball
+        a method that gets position of the cannonball
         Parameters:
             None
         Returns:
@@ -229,7 +334,7 @@ class Cannonball(pygame.sprite.Sprite):
     
     def update(self):
         '''
-        the function to update the cannonball position
+        the method to update the cannonball position
         Parameters:
             none
         Returns:
@@ -243,7 +348,7 @@ class Cannonball(pygame.sprite.Sprite):
     
     def draw(self, surface):
         '''
-        a function to draw the cannonball or explosion
+        a method to draw the cannonball or explosion
         Parameters:
             surface: the surface to draw on
         Returns:
@@ -271,7 +376,7 @@ class testCannonball(unittest.TestCase):
     def tearDown(self):
         self.ball.reset()
         pygame.quit()
-    
+
     def test_set(self):
         self.ball.set(self.start,self.end)
         self.assertEqual(self.ball.exploding, False)
@@ -281,7 +386,7 @@ class testCannonball(unittest.TestCase):
         (x,y) = self.start.get()
         self.assertEqual(self.ball.rect.x,x)
         self.assertEqual(self.ball.rect.y,y)
-    
+
     def test_in_air(self):
         self.assertEqual(self.ball.in_air(), False)
         self.ball._shoot = True
