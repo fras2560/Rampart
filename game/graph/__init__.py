@@ -14,13 +14,15 @@ Imports
 import logging
 import networkx as nx
 from rampart.config import PAINTED, BLOCK
-
+from graph.terrain import Terrain
 class Graph():
-    def __init__(self, row, column, logger=None):
+    def __init__(self, row, column, color=None, logger=None):
         '''
         Parameters:
             row: the number of nodes in a row (int > 0)
             column: the number of nodes in a column (int > 0)
+            color: the color of the background of each node (RR,GG,BB)
+            logger: the logger of the class (logger)
         '''
         assert row > 0, 'Graph initialized with invalid row size (<= 0)'
         assert column > 0, 'Graph initialized with invalid column size (<= 0)'
@@ -186,7 +188,7 @@ class Graph():
 
 import unittest
 from graph.node import Node
-from rampart.config import GRASS
+from rampart.config import GRASS, TERRAIN_TO_FILE, BACKGROUND, NODE_SIZE
 import pygame
 class Test(unittest.TestCase):
 
@@ -199,6 +201,7 @@ class Test(unittest.TestCase):
         self.g = Graph(self.rows, self.columns, logger=logger)
         pygame.init()
         self.screen = pygame.display.set_mode((200, 200))
+        self.terrain = Terrain(TERRAIN_TO_FILE, NODE_SIZE, BACKGROUND)
 
     def tearDown(self):
         pygame.quit()
@@ -273,7 +276,7 @@ class Test(unittest.TestCase):
                          'get_row_column: return invalid value')
 
     def testPaintSimple(self):
-        nodes = [Node(0, 0, GRASS)] * 9
+        nodes = [Node(x=0, y=0, terrain=GRASS, images=self.terrain)] * 9
         node_id = 0
         for node in nodes:
             row, column = self.g.get_row_column(node_id)
@@ -287,31 +290,31 @@ class Test(unittest.TestCase):
     def testPaintPerimeterCase(self):
         self.g = Graph(5, 5)
         nodes = [
-                 [Node(0, 0, GRASS), 
-                  Node(0, 0, GRASS),
-                  Node(0, 0, GRASS),
-                  Node(0, 0, GRASS),
-                  Node(0, 0, GRASS)],
-                 [Node(0, 0, GRASS), 
-                  Node(0, 0, BLOCK),
-                  Node(0, 0, BLOCK),
-                  Node(0, 0, BLOCK),
-                  Node(0, 0, GRASS)],
-                 [Node(0, 0, GRASS), 
-                  Node(0, 0, BLOCK),
-                  Node(0, 0, GRASS),
-                  Node(0, 0, BLOCK),
-                  Node(0, 0, GRASS)],
-                 [Node(0, 0, GRASS), 
-                  Node(0, 0, BLOCK),
-                  Node(0, 0, BLOCK),
-                  Node(0, 0, BLOCK),
-                  Node(0, 0, GRASS)],
-                 [Node(0, 0, GRASS), 
-                  Node(0, 0, GRASS),
-                  Node(0, 0, GRASS),
-                  Node(0, 0, GRASS),
-                  Node(0, 0, GRASS)]
+                 [Node(x=0, y=0, terrain=GRASS, images=self.terrain), 
+                  Node(x=0, y=0, terrain=GRASS, images=self.terrain),
+                  Node(x=0, y=0, terrain=GRASS, images=self.terrain),
+                  Node(x=0, y=0, terrain=GRASS, images=self.terrain),
+                  Node(x=0, y=0, terrain=GRASS, images=self.terrain)],
+                 [Node(x=0, y=0, terrain=GRASS, images=self.terrain), 
+                  Node(x=0, y=0, terrain=BLOCK, images=self.terrain),
+                  Node(x=0, y=0, terrain=BLOCK, images=self.terrain),
+                  Node(x=0, y=0, terrain=BLOCK, images=self.terrain),
+                  Node(x=0, y=0, terrain=GRASS, images=self.terrain)],
+                 [Node(x=0, y=0, terrain=GRASS, images=self.terrain), 
+                  Node(x=0, y=0, terrain=BLOCK, images=self.terrain),
+                  Node(x=0, y=0, terrain=GRASS, images=self.terrain),
+                  Node(x=0, y=0, terrain=BLOCK, images=self.terrain),
+                  Node(x=0, y=0, terrain=GRASS, images=self.terrain)],
+                 [Node(x=0, y=0, terrain=GRASS, images=self.terrain), 
+                  Node(x=0, y=0, terrain=BLOCK, images=self.terrain),
+                  Node(x=0, y=0, terrain=BLOCK, images=self.terrain),
+                  Node(x=0, y=0, terrain=BLOCK, images=self.terrain),
+                  Node(x=0, y=0, terrain=GRASS, images=self.terrain)],
+                 [Node(x=0, y=0, terrain=GRASS, images=self.terrain), 
+                  Node(x=0, y=0, terrain=GRASS, images=self.terrain),
+                  Node(x=0, y=0, terrain=GRASS, images=self.terrain),
+                  Node(x=0, y=0, terrain=GRASS, images=self.terrain),
+                  Node(x=0, y=0, terrain=GRASS, images=self.terrain)]
                 ]
         for row in range(0, len(nodes)):
             for column in range(0, len(nodes[row])):
@@ -329,7 +332,7 @@ class Test(unittest.TestCase):
             self.assertEqual(nodes[n].is_painted(), expect[n])
 
     def testDraw(self):
-        nodes = [Node(0, 0, GRASS)] * 9
+        nodes = [Node(x=0, y=0, terrain=GRASS, images=self.terrain)] * 9
         node_id = 0
         for node in nodes:
             row, column = self.g.get_row_column(node_id)
@@ -338,7 +341,7 @@ class Test(unittest.TestCase):
         self.g.draw(self.screen)
 
     def testIterate(self):
-        nodes = [Node(0, 0, GRASS)] * 9
+        nodes = [Node(x=0, y=0, terrain=GRASS, images=self.terrain)] * 9
         node_id = 0
         for node in nodes:
             row, column = self.g.get_row_column(node_id)
