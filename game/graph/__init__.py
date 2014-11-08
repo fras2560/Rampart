@@ -13,7 +13,7 @@ Imports
 '''
 import logging
 import networkx as nx
-from rampart.config import PAINTED, BLOCK
+from rampart.config import PAINTED, BLOCK, CANBUILD
 from graph.terrain import Terrain
 class Graph():
     def __init__(self, row, column, color=None, logger=None):
@@ -186,6 +186,22 @@ class Graph():
                     self.paint_aux(neighbor)
         return
 
+    def available(self, node_id):
+        '''
+        a method that checks if the spot is available along with its neighbors
+        Parameters:
+            node_id: the node to check (int)
+        Returns:
+            yes: True if spot is available (boolean)
+        '''
+        yes = True
+        nodes = nx.get_node_attributes(self.graph, 'nodes')
+        for neighbor in self.graph.neighbors(node_id):
+            if nodes[neighbor].get_type() not in CANBUILD:
+                self.logger.debug(nodes[neighbor].get_type())
+                yes = False
+                break
+        return yes
 import unittest
 from graph.node import Node
 from rampart.config import GRASS, TERRAIN_TO_FILE, BACKGROUND, NODE_SIZE
@@ -358,7 +374,47 @@ class Test(unittest.TestCase):
             count += 1
             self.assertEqual(str(n),expect)
         self.assertEqual(count, 3)
-        
+
+    def testAvailable(self):
+        self.g = Graph(5, 5)
+        nodes = [
+                 [Node(x=0, y=0, terrain=GRASS, images=self.terrain), 
+                  Node(x=0, y=0, terrain=GRASS, images=self.terrain),
+                  Node(x=0, y=0, terrain=GRASS, images=self.terrain),
+                  Node(x=0, y=0, terrain=GRASS, images=self.terrain),
+                  Node(x=0, y=0, terrain=GRASS, images=self.terrain)],
+                 [Node(x=0, y=0, terrain=GRASS, images=self.terrain), 
+                  Node(x=0, y=0, terrain=GRASS, images=self.terrain),
+                  Node(x=0, y=0, terrain=GRASS, images=self.terrain),
+                  Node(x=0, y=0, terrain=GRASS, images=self.terrain),
+                  Node(x=0, y=0, terrain=GRASS, images=self.terrain)],
+                 [Node(x=0, y=0, terrain=GRASS, images=self.terrain), 
+                  Node(x=0, y=0, terrain=GRASS, images=self.terrain),
+                  Node(x=0, y=0, terrain=GRASS, images=self.terrain),
+                  Node(x=0, y=0, terrain=GRASS, images=self.terrain),
+                  Node(x=0, y=0, terrain=GRASS, images=self.terrain)],
+                 [Node(x=0, y=0, terrain=GRASS, images=self.terrain), 
+                  Node(x=0, y=0, terrain=BLOCK, images=self.terrain),
+                  Node(x=0, y=0, terrain=BLOCK, images=self.terrain),
+                  Node(x=0, y=0, terrain=BLOCK, images=self.terrain),
+                  Node(x=0, y=0, terrain=GRASS, images=self.terrain)],
+                 [Node(x=0, y=0, terrain=GRASS, images=self.terrain), 
+                  Node(x=0, y=0, terrain=GRASS, images=self.terrain),
+                  Node(x=0, y=0, terrain=GRASS, images=self.terrain),
+                  Node(x=0, y=0, terrain=GRASS, images=self.terrain),
+                  Node(x=0, y=0, terrain=GRASS, images=self.terrain)]
+                ]
+        for row in range(0, len(nodes)):
+            for column in range(0, len(nodes[row])):
+                self.g.set_node(row, column, nodes[row][column])
+        available = [i for i in range(0, 10)]
+        not_available = [i for i in range(10, 25)]
+        for a in available:
+            result = self.g.available(a)
+            self.assertEqual(result, True, "%d: was not available" % a)
+        for na in not_available:
+            result = self.g.available(na)
+            self.assertEqual(result, False, "%d: was available" % na)
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
