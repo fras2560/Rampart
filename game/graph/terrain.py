@@ -11,27 +11,28 @@ class Terrain():
     '''
     a class to hold all the terrain images and rects
     '''
-    def __init__(self, terrain_to_files, terrain, color):
+    def __init__(self, terrain_to_files, terrain_size, color):
         '''
         Terrain()
         Parameters:
             terrain_to_files: a dictionary of the terrains, their states and 
                              images for each terrain state (dict)
-            terrain: the size of the terrain (int)
+            terrain_size: the size of the terrain (int)
             color: the color of the background (RR,GG,BB)
         '''
         self.images ={}
         self.rects = {}
+        size = (terrain_size, terrain_size)
         for terrain in terrain_to_files:
             self.images[terrain] = []
             self.rects[terrain] = []
             for state in terrain_to_files[terrain]:
+                images = []
+                rects = []
                 for pic in state:
-                    images = []
-                    rects = []
                     fp = file_path(pic, image=True)
                     image = pygame.image.load(fp).convert()
-                    image = pygame.transform.scale(image, (terrain, terrain))
+                    image = pygame.transform.scale(image, size)
                     image.set_colorkey(color)
                     rect = image.get_rect()
                     images.append(image)
