@@ -12,7 +12,6 @@ from rampart.point import Point
 from rampart.color import Color
 import pygame
 import helper
-from config import  GRAVITY
 
 class Bezier():
     def __init__(self):
@@ -142,6 +141,7 @@ class Equation():
         self.step = 0
         self.tol = 10
         self.done = False
+        self.velocity = 10
 
     def reset(self):
         '''
@@ -152,13 +152,11 @@ class Equation():
             None
         '''
         self.bezier.reset()
-        self.velocity = 0
-        self.y0 = 0
-        self.time = 0
+        self.u = 0
         self.step = 0
-        self.x0 = 0
-        self.vertical = False
-        self.g = GRAVITY
+        self.tol = 10
+        self.done = False
+        self.velocity = 1
         
     def set(self,p1, p2):
         '''
@@ -171,18 +169,28 @@ class Equation():
         '''
         (x1,y1) = p1.get()
         (x2,y2) = p2.get()
+        left = x2 - x1 > 0
+        up = y2 - y1 > 0
         dx = math.fabs(x1 - x2)
         dy = math.fabs(y1 - y2)
         euclidean = math.sqrt(dx*dx+dy*dy)
+        if left and up:
+            pull = -euclidean
+        elif not left and up:
+            pull = euclidean
+        elif left and not up:
+            pull = euclidean
+        elif not up and not left:
+            pull = - euclidean
         if (dx < self.tol and dx < dy/2):
             mid_y = (y1+y2) / 2
-            mid_x = min(x1,x2) + euclidean
+            mid_x = min(x1,x2) + pull
         else:
             #more vertical, more arc
             mid_x = (x1 + x2) / 2
-            mid_y = min(y1,y2) + euclidean
+            mid_y = min(y1,y2) + pull
         #set the the step size
-        self.step = 1 / float(euclidean)
+        self.step = 1 / float(euclidean) * self.velocity
         # add the three points
         self.bezier.add_point(p1)
         pmid = Point()
@@ -190,6 +198,7 @@ class Equation():
         self.bezier.add_point(pmid)
         self.bezier.add_point(p2)
         self.bezier.set_coeffs()
+        self.direction = x2 - x1
         return 
 
     def get(self):
@@ -201,6 +210,7 @@ class Equation():
             point: the current point (Point)
         '''
         p = self.bezier.get_point(self.u)
+        print(p.get())
         self.u += self.step
         if(self.u >= 1.0):
             self.done = True
@@ -292,12 +302,7 @@ class Cannonball(pygame.sprite.Sprite):
             None
         '''
         self.position = self.equation.get()
-        (x1,y1) = self.position.get()
-        (x2,y2) = self.end.get()
-        dx = x2 - x1
-        dy = y2 - y1
-        _euclidean = math.sqrt(dx*dx + dy*dy)
-        if self.past_end(x1,x2,self.equation.step):
+        if self.equation.done:
             self.exploding = True
             self.bomb.set(self.end)
         return
