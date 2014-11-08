@@ -248,12 +248,12 @@ class Piece():
             column = 0
             row_result = []
             while column < len(m2[row]):
-                sum = 0
+                ssum = 0
                 inside = 0
                 while inside < len(m1[row]):
-                    sum += m1[row][inside] * m2[inside][column]
+                    ssum += m1[row][inside] * m2[inside][column]
                     inside += 1
-                row_result.append(sum)
+                row_result.append(ssum)
                 column += 1
             result.append(row_result)
             row += 1
