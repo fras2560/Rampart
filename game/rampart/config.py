@@ -8,20 +8,36 @@
 from math import pi
 import os
 SIZE = (500, 500)
+
 '''
-directions"
+Defaults
+'''
+BACKGROUND = ( 255, 255, 255) # white
+
+'''
+Directions and Movements
 '''
 DOWN = 1
 UP = -1
 LEFT = -1
 RIGHT = 1
+NO_MOVE = 0
+CLOCKWISE = -pi/2
+COUNTER_CLOCKWISE = pi/2
+
 '''
-a list of game modes
+Game Modes and Constants
 '''
 BUILDING = 0
 SHOOTING = 1
+GRAVITY = -0.049
+LIVES = 3
+NONPLAYER = 0
+PLAYERONE = 1
+PLAYERTWO = 2
+
 '''
-list of assets Images
+Node Images
 '''
 I_CANNON = 'cannon.png'
 O_GRASS_NORMAL = 'grass-odd.png'
@@ -40,8 +56,9 @@ I_CASTLE_2 = 'castle_2.png'
 I_CASTLE_3 = 'castle_3.png'
 I_BLOCK = 'wall.png'
 BASE = os.path.join(os.path.dirname(os.getcwd()),'levels', 'base.txt')
+
 '''
-Node Types and Constants
+Node Types, Constants, and Indexes
 '''
 EMPTY = 0
 BLOCK = 1
@@ -52,8 +69,12 @@ WALL = 5
 CASTLE = 6
 EXTERIOR = 7
 PAINTED = 1
-TERRAIN = 10 #terrain size
+NODE_SIZE = 10
+NORMAL = 0
+DESTROYED = 1
+UNPAINTED = 2
 TYPES = [BLOCK, CANNON, GRASS, WATER, WALL, CASTLE, EXTERIOR]
+# dict holds terrain and list of images
 TERRAIN_TO_FILE = {CANNON: [
                             [I_CANNON],
                             [I_CANNON],
@@ -90,34 +111,4 @@ TERRAIN_TO_FILE = {CANNON: [
                               [E_EXTERIOR, O_EXTERIOR]
                              ]
                   }
-
 CANBUILD = [GRASS]
-NODE_SIZE = 10
-
-'''
-PICTURE INDEXES
-'''
-NORMAL = 0
-DESTROYED = 1
-UNPAINTED = 2
-'''
-Player constants
-'''
-NONPLAYER = 0
-PLAYERONE = 1
-PLAYERTWO = 2
-
-'''
-movements
-'''
-NO_MOVE = 0
-CLOCKWISE = -pi/2
-COUNTER_CLOCKWISE = pi/2
-'''
-Physics constants
-'''
-GRAVITY = -0.049
-'''
-Player constants
-'''
-LIVES = 3
