@@ -31,7 +31,8 @@ E_GRASS_UNPAINTED = "territory-even.png"
 O_GRASS_UNPAINTED = "territory-odd.png"
 O_WATER = 'sea-odd.png'
 E_WATER = 'sea-even.png'
-
+O_EXTERIOR = "exterior-odd.png"
+E_EXTERIOR = "exterior-even.png"
 I_WALL = 'wall.png'
 I_CASTLE = 'castle.png'
 I_CASTLE_1 = 'castle_1.png'
@@ -49,9 +50,10 @@ GRASS = 3
 WATER = 4
 WALL = 5
 CASTLE = 6
+EXTERIOR = 7
 PAINTED = 1
 TERRAIN = 10 #terrain size
-TYPES = [BLOCK, CANNON, GRASS, WATER, WALL, CASTLE]
+TYPES = [BLOCK, CANNON, GRASS, WATER, WALL, CASTLE, EXTERIOR]
 TERRAIN_TO_FILE = {CANNON: [
                             [I_CANNON],
                             [I_CANNON],
@@ -81,7 +83,12 @@ TERRAIN_TO_FILE = {CANNON: [
                           [I_WALL],
                           [I_WALL],
                           [I_WALL]
-                         ]
+                         ],
+                   EXTERIOR: [
+                              [E_EXTERIOR, O_EXTERIOR],
+                              [E_EXTERIOR, O_EXTERIOR],
+                              [E_EXTERIOR, O_EXTERIOR]
+                             ]
                   }
 
 CANBUILD = [GRASS]
