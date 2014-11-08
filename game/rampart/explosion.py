@@ -5,22 +5,27 @@
 @date: 06/04/2014
 @note: This class is used for rampart game
 '''
-from point import Point
-import os
 import pygame
 import helper
 from color import Color
-
+from rampart.config import EXPLOSIONS
 class Explosion(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
+        self.images = []
+        self.rects = []
         self.color = Color()
+        for explosion in EXPLOSIONS:
+            fp = helper.file_path(explosion, image=True)
+            image = pygame.image.load(fp).convert()
+            image.set_colorkey(self.color.black)
+            self.images.append(image)
+            self.rects.append(image.get_rect())
         self.stage = 1
-        self.image = pygame.image.load(helper.file_path("explosion_1.png", image=True)).convert()
-        self.image.set_colorkey(self.color.black)
         self.finished = False
         self.radius = 5
-        self.rect = self.image.get_rect()
+        self.x = 0 
+        self.y = 0
 
     def set(self, point):
         '''
@@ -36,21 +41,6 @@ class Explosion(pygame.sprite.Sprite):
         self.x = x
         self.y = y
 
-    def load_image(self):
-        '''
-        a function to load the current image of the explosion
-        Parameters:
-            None
-        Returns:
-            None
-        '''
-        fp = helper.file_path("explosion_"+str(self.stage)+".png", image=True)
-        self.image = pygame.image.load(fp).convert()
-        self.image.set_colorkey(self.color.black)
-        self.rect = self.image.get_rect()
-        self.rect.x = self.x
-        self.rect.y = self.y
-
     def update(self):
         '''
         a function that updates the explosion sequence
@@ -59,18 +49,7 @@ class Explosion(pygame.sprite.Sprite):
         Returns:
             None
         '''
-        if self.stage == 1:
-            self.load_image()
-        elif self. stage == 2:
-            self.load_image()
-        elif self.stage == 3:
-            self.load_image()
-        elif self.stage == 4:
-            self.load_image()
-        elif self.stage == 5:
-            self.load_image()
-        elif self.stage >= 6:
-            self.load_image()
+        if self.stage >= 6:
             self.finished = True
         self.stage += 1
 
@@ -81,4 +60,41 @@ class Explosion(pygame.sprite.Sprite):
             surface: the surface to draw on
         '''
         surface_blit = surface.blit
-        surface_blit(self.image, self.rect)
+        if self.stage < len(self.images):
+            self.rects[self.stage].x = self.x
+            self.rects[self.stage].y = self.y
+            surface_blit(self.images[self.stage], self.rects[self.stage])
+
+import unittest
+from rampart.point import Point
+class testExplosion(unittest.TestCase):
+    def setUp(self):
+        pygame.init()
+        self.screen = pygame.display.set_mode((200, 200))
+        pygame.display.set_caption("Test Explosion Object")
+        self.explosion = Explosion()
+        self.p = Point()
+        self.p.set(x=10, y=10)
+
+    def tearDown(self):
+        pygame.quit()
+
+    def testUpdate(self):
+        i = 1
+        self.assertEqual(self.explosion.stage, i)
+        while not self.explosion.finished:
+            self.explosion.update()
+            i += 1
+            self.assertEqual(self.explosion.stage, i)
+        self.assertEqual(self.explosion.stage, 7)
+
+    def testSetPoint(self):
+        self.explosion.set(self.p)
+        self.assertEqual(self.explosion.x, 10)
+        self.assertEqual(self.explosion.y, 10)
+
+    def testDraw(self):
+        self.explosion.set(self.p)
+        while not self.explosion.finished:
+            self.explosion.draw(self.screen)
+            self.explosion.update()
