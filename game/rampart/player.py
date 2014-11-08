@@ -5,20 +5,19 @@
 @date: 06/04/2014
 @note: This class is used for rampart game
 '''
-import helper
 import pygame
-from config import CASTLE, CANNON, LIVES, BUILDING, SHOOTING
+from rampart.config import CASTLE, CANNON, LIVES, BUILDING, SHOOTING
 from rampart.cannonball import Cannonball
 from rampart.point import Point
 from rampart.cursor import Cursor
 from rampart.piece import Piece
 from rampart.color import Color
 class Player():
-    def __init__(self, id=None, point=None, color=None):
+    def __init__(self, iid=None, point=None, color=None):
         '''
         this class is used for player interactions
         Parameters:
-            id: the player id (int)
+            iid: the player id (int)
             point: the starting point of the player's cursor
             color: the player's color
         Properties:
@@ -34,8 +33,8 @@ class Player():
         self.towers = []
         self.points = 0
         self.lives = LIVES
-        if id is None:
-            id = 1
+        if iid is None:
+            iid = 1
         self.id = id
         self.cursor = Cursor()
         if point is None:
@@ -190,6 +189,8 @@ class Player():
 
 import unittest
 from graph.node import Node
+from graph.terrain import Terrain
+from rampart.config import NODE_SIZE, TERRAIN_TO_FILE, BACKGROUND
 class PlayerTest(unittest.TestCase):
     def setUp(self):
         pygame.init()
@@ -197,6 +198,7 @@ class PlayerTest(unittest.TestCase):
         pygame.display.set_caption("Test Player Object")
         self.color = Color()
         self.screen.fill(self.color.white)
+        self.terrain = Terrain(TERRAIN_TO_FILE, NODE_SIZE, BACKGROUND)
         self.player = Player()
 
     def tearDown(self):
@@ -208,8 +210,8 @@ class PlayerTest(unittest.TestCase):
     def addCastle(self):
         x = 0
         y = 0
-        castle = Node(x=x, y=y, image_file="castle.png", terrain=CASTLE,
-                      player=1)
+        castle = Node(x=x, y=y, terrain=CASTLE,
+                      player=1, images=self.terrain)
         self.player.add_castle(castle)
 
     def addCannon(self, x=None, y=None):
@@ -217,8 +219,8 @@ class PlayerTest(unittest.TestCase):
             x = 0
         if y is None:
             y = 0
-        castle = Node(x=x, y=y, image_file="cannon.png", terrain=CANNON,
-                      player=1)
+        castle = Node(x=x, y=y, terrain=CANNON,
+                      player=1, images=self.terrain)
         self.player.add_cannon(castle)
 
     def testAddCastle(self):
@@ -257,7 +259,7 @@ class PlayerTest(unittest.TestCase):
         self.addCannon()
         self.addCannon(x=10, y=10)
         self.player.move(10, 10)
-        shot1 = self.player.shoot()
+        __shot1 = self.player.shoot()
         delete = self.player.update()
         while delete == []:
             self.player.draw(self.screen)
