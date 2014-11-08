@@ -59,7 +59,7 @@ class TerrainTeser(unittest.TestCase):
         self.terrain = Terrain(TERRAIN_TO_FILE, NODE_SIZE, ( 189,   0, 252))
 
     def tearDown(self):
-        pass
+        pygame.quit()
 
     def testGetImage(self):
         states = [NORMAL, DESTROYED, UNPAINTED]
