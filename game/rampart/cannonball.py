@@ -62,7 +62,7 @@ class Equation():
         (x1,y1) = p1.get()
         (x2,y2) = p2.get()
         dx = x2 - x1
-        dy = y2 - y1
+        _dy = y2 - y1
         self.y0 = y1
         self.x0 = x1
         top = float(y2) + 0.5*self.g * float(dx)*float(dx) - float(self.y0)
@@ -191,7 +191,7 @@ class Cannonball(pygame.sprite.Sprite):
         (x2,y2) = self.end.get()
         dx = x2 - x1
         dy = y2 - y1
-        euclidean = math.sqrt(dx*dx + dy*dy)
+        _euclidean = math.sqrt(dx*dx + dy*dy)
         if self.past_end(x1,x2,self.equation.step):
             self.exploding = True
             self.bomb.set(self.end)
