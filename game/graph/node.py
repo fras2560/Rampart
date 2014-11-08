@@ -226,8 +226,7 @@ Unittest Imports
 -------------------------------------------------------------------------------
 '''
 import unittest
-from rampart.config import SIZE, CANNON, GRASS
-from rampart.config import TERRAIN_TO_FILE, NODE_SIZE
+from rampart.config import SIZE, CANNON
 '''
 -------------------------------------------------------------------------------
 Unittests for Node
