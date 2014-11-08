@@ -12,10 +12,10 @@ Imports
 -------------------------------------------------------------------------------
 '''
 import pygame
-from rampart.helper import file_path
-from rampart.config import TERRAIN, TYPES, NONPLAYER, TERRAIN_TO_FILE
+from rampart.config import TYPES, NONPLAYER, TERRAIN_TO_FILE
 from rampart.config import NORMAL, NODE_SIZE, UNPAINTED, DESTROYED
 from rampart.color import Color
+from graph.terrain import Terrain
 import logging
 
 '''
@@ -25,22 +25,36 @@ Node Class
 '''
 
 class Node(pygame.sprite.Sprite):
-    def __init__(self, x=None, y=None, terrain=None,
+    '''
+        Properties:
+            self.terrain: holds all the terrain images (Terrian)
+            self.x: the x position of the node (int)
+            self.y: the y position of the node (int)
+            self.type: the type of the terrain (int)
+            self.painted: True if node was painted False otherwise (boolean)
+            self.state: the state of the node (int)
+            self.player: the player id (int)
+            self.logger: the logger of the class (logger)
+        Defaults:
+            self.painted: True
+            self.player: NONPLAYER
+            self.logger = logging.INFO
+    '''
+    def __init__(self, x=None, y=None, terrain=None, images=None,
                  logger=None, string_object=None, player=None):
         '''
         Parameters:
             x: the initial position of the x co-ordinate (int >= 0)
             y: the initial position of the y co-ordinate (int >= 0 )
-            image_file: name of the image file 
-                        in the assets/image directory (string)
+            images: the terrain holding all the images (Terrain)
             terrain: the type of terrain the node is (type in CONFIG)
             logger: the logger of the node object (logger)
             string_object: the string representing the obejct (string)
             player: the player id (int)
         Ways to Initialize:
-            Node(x=int, y=int, terrain=int)
+            Node(x=int, y=int, terrain=int, images=Terrain)
             OR
-            Node(string_object=string)
+            Node(string_object=string, images=Terrain)
             logger is always an option argument
         '''
         if string_object is not None:
@@ -52,23 +66,9 @@ class Node(pygame.sprite.Sprite):
         assert x >= 0, 'Node (x < 0) not initialized properly'
         assert y >= 0, 'Node (y < 0) not initialized properly'
         assert terrain in TYPES, ' Node given non-valid type'
-        self.color = Color()
-        image_files = TERRAIN_TO_FILE[terrain]
-        self.images = []
-        self.rects = []
-        for f_type in image_files:
-            images = []
-            rects = []
-            for f in f_type:
-                fp = file_path(f, image=True)
-                image = pygame.image.load(fp).convert()
-                image = pygame.transform.scale(image, (TERRAIN, TERRAIN))
-                image.set_colorkey(self.color.green)
-                rect = image.get_rect()
-                images.append(image)
-                rects.append(rect)
-            self.images.append(images)
-            self.rects.append(rects)
+        e = 'images not a terrain object'
+        assert images.__class__.__name__ == 'Terrain', e 
+        self.terrain = images
         self.x = x
         self.y = y
         self.type = terrain
@@ -152,11 +152,13 @@ class Node(pygame.sprite.Sprite):
             if self.state != DESTROYED:
                 self.state = UNPAINTED
         odd = (row % 2 + column) % 2
-        if odd == 1 and len(self.rects[self.state]) < 2:
+        rect = self.terrain.get_rect(self.type, self.state)
+        image = self.terrain.get_image(self.type, self.state)
+        rect[odd].x = self.x
+        rect[odd].y = self.y
+        if odd == 1 and len(rect) < 2:
             odd = 0
-        self.rects[self.state][odd].x = self.x
-        self.rects[self.state][odd].y = self.y
-        surface_blit(self.images[self.state][odd], self.rects[self.state][odd])
+        surface_blit(image[odd], rect[odd])
 
     def get_type(self):
         '''
@@ -225,6 +227,7 @@ Unittest Imports
 '''
 import unittest
 from rampart.config import SIZE, CANNON, GRASS
+from rampart.config import TERRAIN_TO_FILE, NODE_SIZE
 '''
 -------------------------------------------------------------------------------
 Unittests for Node
@@ -238,8 +241,12 @@ class Test(unittest.TestCase):
         pygame.display.set_caption("Test Node Object")
         self.color = Color()
         self.screen.fill(self.color.white)
-        self.f = 'cannon.png'
-        self.node = Node(10, 10, CANNON )
+        self.terrain = Terrain(TERRAIN_TO_FILE, NODE_SIZE, self.color.green)
+        logging.basicConfig(level=logging.DEBUG,
+                            format='%(asctime)s %(message)s')
+        logger = logging.getLogger(__name__)
+        self.node = Node(x=10, y=10, terrain=CANNON,
+                         images=self.terrain, logger=logger)
 
     def tearDown(self):
         pygame.quit()
@@ -281,17 +288,18 @@ class Test(unittest.TestCase):
 
     def testFailedInitialize(self):
         try:
-            self.node = Node(-1, -1, self.f, CANNON)
+            self.node = Node(x=-1, y=-1, terrain=CANNON, images=self.terrain)
             self.assertEqual(True, False, "Should throw exception (x < 0)")
         except AssertionError:
             pass
         try:
-            self.node = Node(0, -1, self.f, CANNON)
+            self.node = Node(x=0, y=-1, terrain=CANNON, images=self.terrain)
             self.assertEqual(True, False, "Should throw exception (x < 0)")
         except AssertionError:
             pass
         try:
-            self.node = Node(0, -1, self.f, len(TYPES)*10)
+            self.node = Node(x=0, y=-1,
+                             terrain=len(TYPES)*10, images=self.terrain)
             self.assertEqual(True, False,
                              "Should throw exception (non-valid terrain)")
         except AssertionError:
@@ -307,7 +315,7 @@ class Test(unittest.TestCase):
 
     def testInitializeWithString(self):
         node_string = str(self.node)
-        self.node = Node(string_object=node_string)
+        self.node = Node(string_object=node_string, images=self.terrain)
         self.assertEqual(node_string, str(self.node))
 
     def testImproperInitialize(self):
@@ -317,21 +325,26 @@ class Test(unittest.TestCase):
         except AssertionError:
             pass
         try:
-            self.node = Node(x=1, y=2, terrain=5)
+            self.node = Node(x=1, y=2, terrain=5, images=self.terrain)
             self.assertEqual(True, False, 'Exception should be thrown')
         except AssertionError:
             pass
         try:
-            self.node = Node(x=1, y=2, terrain=5)
+            self.node = Node(x=1, y=2, terrain=5, images=self.terrain)
             self.assertEqual(True, False, 'Exception should be thrown')
         except AssertionError:
             pass
         try:
-            self.node = Node(x=1, y=2, terrain='s')
+            self.node = Node(x=1, y=2, terrain='s', images=self.terrain)
             self.assertEqual(True, False, 'Exception should be thrown')
         except AssertionError:
             pass
 
+        try:
+            self.node = Node(x=1, y=2, terrain=1, images=1)
+            self.assertEqual(True, False, 'Exception should be thrown')
+        except AssertionError:
+            pass
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
