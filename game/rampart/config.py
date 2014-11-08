@@ -37,6 +37,16 @@ PLAYERONE = 1
 PLAYERTWO = 2
 
 '''
+Explosion Images
+'''
+EXPLOSIONS = ['explosion_1.png',
+              'explosion_2.png',
+              'explosion_3.png',
+              'explosion_4.png',
+              'explosion_5.png',
+              'explosion_6.png'
+              ]
+'''
 Node Images
 '''
 I_CANNON = 'cannon.png'
