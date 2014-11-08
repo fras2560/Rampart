@@ -154,10 +154,10 @@ class Node(pygame.sprite.Sprite):
         odd = (row % 2 + column) % 2
         rect = self.terrain.get_rect(self.type, self.state)
         image = self.terrain.get_image(self.type, self.state)
-        rect[odd].x = self.x
-        rect[odd].y = self.y
         if odd == 1 and len(rect) < 2:
             odd = 0
+        rect[odd].x = self.x
+        rect[odd].y = self.y
         surface_blit(image[odd], rect[odd])
 
     def get_type(self):
