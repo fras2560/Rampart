@@ -20,3 +20,4 @@ class Color():
         self.white =    ( 255, 255, 255)
         self.black =    (   0,   0,   0)
         self.grey =     ( 119, 119, 122)
+        self.stone =    ( 139, 141, 122)
