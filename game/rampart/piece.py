@@ -270,7 +270,7 @@ class Piece():
         points = self.return_points()
         for point in points:
             pygame.draw.rect(surface, color,
-                             (point[0], point[1], NODE_SIZE, NODE_SIZE))
+                             (point[0], point[1], NODE_SIZE, NODE_SIZE), 1)
 
 class test_Suite(unittest.TestCase):
     def setUp(self):
