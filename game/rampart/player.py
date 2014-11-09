@@ -6,7 +6,7 @@
 @note: This class is used for rampart game
 '''
 import pygame
-from rampart.config import CASTLE, CANNON, LIVES, BUILDING, SHOOTING
+from rampart.config import CASTLE, CANNON, LIVES, BUILDING, SHOOTING, NOMODE
 from rampart.cannonball import Cannonball
 from rampart.point import Point
 from rampart.cursor import Cursor
@@ -98,8 +98,9 @@ class Player():
             for ball in self.cannonballs:
                 self.cannonballs[ball].draw(surface)
             self.cursor.draw(surface)
-        else:
+        elif self.mode == BUILDING:
             self.piece.draw(surface, self.color)
+
 
     def shoot(self):
         '''
@@ -190,6 +191,15 @@ class Player():
             None
         '''
         self.mode = BUILDING
+
+    def normal_mode(self):
+        '''
+        a method used to change the player's mode to normal
+        Parameters:
+            None
+        Returns: None
+        '''
+        self.mode = NOMODE
 
 import unittest
 from graph.node import Node

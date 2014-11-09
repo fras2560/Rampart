@@ -22,14 +22,11 @@ def draw_castle(surface, x, y, color):
     c = Color()
     xs = [x + i*NODE_SIZE for i in range(0, 4)]
     ys = [y + i*NODE_SIZE for i in range(0, 3)]
-    print(xs)
     TRIANGLE_HEIGHT = NODE_SIZE // 3
     CASTLE_WIDTH = NODE_SIZE // 2
     CASTLE_HEIGHT = (2 * NODE_SIZE) - TRIANGLE_HEIGHT
     CASTLE_HEIGHT = CASTLE_HEIGHT - (CASTLE_HEIGHT % 2)
     TRIANGLE_WIDTH = CASTLE_WIDTH
-    print(CASTLE_WIDTH)
-    print(CASTLE_HEIGHT)
     # draw base
     r = (xs[0] + (CASTLE_WIDTH), ys[2] - CASTLE_HEIGHT//2,
                   CASTLE_WIDTH * 4, CASTLE_HEIGHT//2)
@@ -47,7 +44,6 @@ def draw_castle(surface, x, y, color):
          CASTLE_WIDTH, CASTLE_HEIGHT//2)
     pygame.draw.rect(surface, c.stone, r)
     pygame.draw.rect(surface, c.black, r, 1)
-
     # draw castle points (triangles)
     pl = make_triangle(xs[0], ys[2] - CASTLE_HEIGHT,
                        TRIANGLE_HEIGHT, TRIANGLE_WIDTH)

@@ -137,15 +137,19 @@ class Level():
         col_cond = column > 2 and column < self.columns - 2
         outer_edge = row_cond and col_cond
         if player is not None:
-            player = player.get_id()
-            self.logger.info("Player's Castle: %i" % player)
+            p = player.get_id()
+            self.logger.info("Player's Castle: %i" % p)
         self.logger.info("Outer edge condition: %s" % outer_edge)
         if player is not None and outer_edge and self.check_castle(row, column):
+            nodes = []
+            i = 0
             for (r, c) in castle_spot(row, column):
-                node = Node(x=c*NODE_SIZE, y=r*NODE_SIZE, terrain=CASTLE,
-                            player=player, images=self.terrain)
-                self.graph.set_node(r, c, node)
+                nodes.append(Node(x=c*NODE_SIZE, y=r*NODE_SIZE, terrain=CASTLE,
+                            player=p, images=self.terrain))
+                self.graph.set_node(r, c, nodes[i])
+                i += 1
             added = True
+            player.add_castle(nodes[0])
         return added
 
     def check_castle(self, row, column):

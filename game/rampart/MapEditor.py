@@ -37,6 +37,8 @@ class Tester():
         self.selected = 0
         self.players = [Player(iid=1, color=self.color.blue),
                         Player(iid=2, color=self.color.red)]
+        self.players[0].normal_mode()
+        self.players[1].normal_mode()
         self.player = self.players[0]
         self.save = os.path.join(os.path.dirname(BASE), 'output.txt')
 
@@ -111,6 +113,8 @@ class Tester():
             self.screen.fill(self.color.white)
             self.display_options()
             self.level.draw(self.screen)
+            for p in self.players:
+                p.draw(self.screen)
             pygame.display.flip()
             self.clock.tick(10)
         pygame.quit()
