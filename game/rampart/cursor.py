@@ -10,50 +10,53 @@ import rampart.helper as helper
 from rampart.color import Color
 
 class Cursor(pygame.sprite.Sprite):
-    def __init__(self):
+    def __init__(self, color=None):
+        '''
+        color: initializes the color of the cursor (RR, GG, BB)
+        '''
         pygame.sprite.Sprite.__init__(self)
-        self.color = Color()
-        self.image = pygame.image.load(helper.file_path("cursor.png", image=True)).convert()
-        self.image.set_colorkey(self.color.black)
-        self.rect = self.image.get_rect()
-    
+        self.colors = Color()
+        if color is None:
+            self.color = self.colors.blue
+            
+        
     def set(self, point):
         '''
-        a function that sets the point of the cursor
+        a method that sets the point of the cursor
         Parameters:
             point: the point of the cursor
         Returns:
             None
         '''
-        (x,y) = point.get()
-        self.rect.x = x
-        self.rect.y = y
+        (x, y) = point.get()
+        self.x = x
+        self.y = y
     
     def get(self):
         '''
-        a function to get the position of the cursor
+        a method to get the position of the cursor
         Parameters:
             None
         Returns
             (x,y): the x and y position (tuple)
         '''
-        return (self.rect.x, self.rect.y)
+        return (self.x, self.y)
     
     def move(self, horizontal=0, vertical=0):
         '''
-        a function to move the cursor
+        a method to move the cursor
         Parameters:
             horizontal: the movement in the x axis
             vertical: the movement in the y axis
         Returns:
             None
         '''
-        self.rect.x += horizontal
-        self.rect.y += vertical
+        self.x += horizontal
+        self.y += vertical
 
     def update(self):
         '''
-        a function to update the cursor
+        a method to update the cursor
         Parameters:
             None
         Returns:
@@ -63,9 +66,24 @@ class Cursor(pygame.sprite.Sprite):
 
     def draw(self, surface):
         '''
-        a function to draw the cursor
+        a method to draw the cursor
         Parameters:
             surface: the surface to draw on
         '''
-        surface_blit = surface.blit
-        surface_blit(self.image, self.rect)
+        point = (int(self.x), int(self.y))
+        # draw two circles
+        pygame.draw.circle(surface, self.color,
+                           point, 5, 1)
+        pygame.draw.circle(surface, self.colors.black,
+                           point, 2, 1)
+        # draw cross hairs
+        point2 = (int(self.x + 5), int(self.y))
+        point3 = (int(self.x - 5), int(self.y))
+        point4 = (int(self.x), int(self.y + 5))
+        point5 = (int(self.x), int(self.y - 5))
+        
+        pygame.draw.line(surface, self.color, point, point2, 1)
+        pygame.draw.line(surface, self.color, point, point3, 1)
+        pygame.draw.line(surface, self.color, point, point4, 1)
+        pygame.draw.line(surface, self.color, point, point5, 1)
+        
