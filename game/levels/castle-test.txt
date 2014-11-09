@@ -1,0 +1,7 @@
+6X6
+3:x=0y=0player=0,3:x=10y=0player=0,3:x=20y=0player=0,3:x=30y=0player=0,3:x=40y=0player=0,3:x=40y=0player=0
+3:x=0y=0player=0,3:x=10y=0player=0,3:x=20y=0player=0,3:x=30y=0player=0,3:x=40y=0player=0,3:x=40y=0player=0
+3:x=0y=0player=0,3:x=10y=0player=0,3:x=20y=0player=0,3:x=30y=0player=0,3:x=40y=0player=0,3:x=40y=0player=0
+3:x=0y=0player=0,3:x=10y=0player=0,3:x=20y=0player=0,3:x=30y=0player=0,3:x=40y=0player=0,3:x=40y=0player=0
+3:x=0y=0player=0,3:x=10y=0player=0,3:x=20y=0player=0,3:x=30y=0player=0,3:x=40y=0player=0,3:x=40y=0player=0
+3:x=0y=0player=0,3:x=10y=0player=0,3:x=20y=0player=0,3:x=30y=0player=0,3:x=40y=0player=0,3:x=40y=0player=0

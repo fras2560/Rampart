@@ -11,12 +11,17 @@ import pygame
 from rampart.config import WATER, GRASS, CASTLE, NODE_SIZE, BASE
 from rampart.color import Color
 import os
+import logging
+
 SIZE = (700,500)
 MARGIN = 190
 LINE = 10
 BULLET = 5
 class Tester():
     def __init__(self):
+        logging.basicConfig(level=logging.INFO,
+                            format='%(asctime)s %(message)s')
+        self.logger = logging.getLogger(__name__)
         self.screen = None
         self.color = Color()
         pygame.init()
@@ -27,7 +32,7 @@ class Tester():
         self.point = pygame.font.SysFont('monospace', 12)
         self.clock = pygame.time.Clock()
         self.speed = 1
-        self.level = Level(BASE)
+        self.level = Level(BASE, logger=self.logger)
         self.done = False
         self.selected = 0
         self.players = [Player(iid=1, color=self.color.blue),
@@ -93,8 +98,8 @@ class Tester():
                     y = pos[1]
                     if x < SIZE[0] - MARGIN and self.selected > 0:
                         if self.selected == CASTLE:
-                            self.level.add_castle(x, y, self.player)
-                            print("added castle")
+                            added = self.level.add_castle(x, y, self.player)
+                            self.logger.info("Added castle %s" % added)
                         else:
                             ratio = 2
                             x1 = x < SIZE[0] - MARGIN - (ratio+1) * NODE_SIZE

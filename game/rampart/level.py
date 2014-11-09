@@ -130,19 +130,22 @@ class Level():
         '''
         x = x - x % NODE_SIZE
         y = y -y % NODE_SIZE
-        row = x // NODE_SIZE
-        column = y // NODE_SIZE
+        row = y // NODE_SIZE
+        column = x // NODE_SIZE
         added = False
         row_cond = row > 2 and row < self.rows - 2
-        col_cond = column > 2 and column > self.columns - 2
+        col_cond = column > 2 and column < self.columns - 2
         outer_edge = row_cond and col_cond
         if player is not None:
             player = player.get_id()
-        if outer_edge and self.check_castle(row, column):
+            self.logger.info("Player's Castle: %i" % player)
+        self.logger.info("Outer edge condition: %s" % outer_edge)
+        if player is not None and outer_edge and self.check_castle(row, column):
             for (r, c) in castle_spot(row, column):
-                node = Node(x=x, y=y, terrain=CASTLE,
+                node = Node(x=c*NODE_SIZE, y=r*NODE_SIZE, terrain=CASTLE,
                             player=player, images=self.terrain)
                 self.graph.set_node(r, c, node)
+            added = True
         return added
 
     def check_castle(self, row, column):
@@ -159,12 +162,14 @@ class Level():
             try:
                 node_id = self.graph.get_node_id(r, c)
                 if not self.graph.available(node_id):
+                    self.logger.info("Node not available: %d" % node_id)
                     valid = False
             except:
-                self.logger.debug("Invalid node id")
+                self.logger.info("Invalid node id")
                 valid = False
             if not valid:
                 break
+        self.logger.info("Add castle: %s" % valid)
         return valid
 
     def add_cannon(self, x, y, player):
@@ -355,5 +360,27 @@ class Test(unittest.TestCase):
         result = self.level.check_castle(2, 2)
         self.assertEqual(result, False)
 
+    def testAddCastle(self):
+        fp = os.path.join(self.directory, 'castle-test.txt')
+        self.level = Level(fp, logger=self.logger, testing=True)
+        player = Player()
+        added = self.level.add_castle(0, 0, player)
+        self.assertEqual(added, False)
+        added = self.level.add_castle(10, 0, player)
+        self.assertEqual(added, False)
+        added = self.level.add_castle(0, 10, player)
+        self.assertEqual(added, False)
+        added = self.level.add_castle(10, 10, player)
+        self.assertEqual(added, False)
+        added = self.level.add_castle(10, 20, player)
+        self.assertEqual(added, False)
+        added = self.level.add_castle(20, 20, player)
+        self.assertEqual(added, False)
+        added = self.level.add_castle(30, 30, player)
+        self.assertEqual(added, True)
+        added = self.level.add_castle(30, 30, player)
+        self.assertEqual(added, False)
+        
+        
 if __name__ == "__main__":
     unittest.main()
