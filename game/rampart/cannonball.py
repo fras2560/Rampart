@@ -10,8 +10,8 @@ import unittest
 from rampart.explosion import Explosion
 from rampart.point import Point
 from rampart.color import Color
+from rampart.config import ARC
 import pygame
-import helper
 
 class Bezier():
     def __init__(self):
@@ -169,26 +169,34 @@ class Equation():
         '''
         (x1,y1) = p1.get()
         (x2,y2) = p2.get()
-        left = x2 - x1 > 0
+        right = x2 - x1 > 0
         up = y2 - y1 > 0
         dx = math.fabs(x1 - x2)
         dy = math.fabs(y1 - y2)
-        euclidean = math.sqrt(dx*dx+dy*dy)
-        if left and up:
-            pull = -euclidean
-        elif not left and up:
-            pull = euclidean
-        elif left and not up:
-            pull = euclidean
-        elif not up and not left:
-            pull = - euclidean
-        if (dx < self.tol and dx < dy/2):
-            mid_y = (y1+y2) / 2
-            mid_x = min(x1,x2) + pull
+        euclidean = math.sqrt(dx * dx + dy * dy)
+        distance = min(euclidean, ARC)
+        mx = (x1 + x2) // 2
+        my = (y1 + y2) // 2
+        mid_y = my # assume in the middle
+        mid_x = mx # assume in the middle
+        if (dx < self.tol and dx < dy / 2):
+            mid_x = max(x1, x2) + distance
+        elif (dy < self.tol  and dy < dx / 2):
+            mid_y = min(y1, y2) - distance
         else:
-            #more vertical, more arc
-            mid_x = (x1 + x2) / 2
-            mid_y = min(y1,y2) + pull
+            if right and up:
+                mid_y += distance
+                mid_x -= distance
+            elif right and not up:
+                mid_y -= distance
+                mid_x += distance
+            elif not right and up:
+                mid_y -= distance
+                mid_x += distance
+            elif not right and not up:
+                mid_y -= distance
+                mid_x -= distance
+        print(distance, mid_x, mid_y)
         #set the the step size
         self.step = 1 / float(euclidean) * self.velocity
         # add the three points
@@ -198,7 +206,6 @@ class Equation():
         self.bezier.add_point(pmid)
         self.bezier.add_point(p2)
         self.bezier.set_coeffs()
-        self.direction = x2 - x1
         return 
 
     def get(self):
@@ -210,7 +217,6 @@ class Equation():
             point: the current point (Point)
         '''
         p = self.bezier.get_point(self.u)
-        print(p.get())
         self.u += self.step
         if(self.u >= 1.0):
             self.done = True
@@ -241,10 +247,6 @@ class Cannonball(pygame.sprite.Sprite):
         self.end = None
         self.position = None
         self.color = Color()
-        fp = helper.file_path("cannonball.png", image=True)
-        self.image = pygame.image.load(fp).convert()
-        self.image.set_colorkey(self.color.black)
-        self.rect = self.image.get_rect()
         self.bomb = Explosion()
         self.exploding = False
 
@@ -260,8 +262,8 @@ class Cannonball(pygame.sprite.Sprite):
         self._shoot = False
         self.end = None
         self.position = None
-        self.rect.x = -1
-        self.rect.y = -1
+        self.x = -1
+        self.y = -1
         self.exploding = False
 
     def set(self, p1, p2):
@@ -279,8 +281,8 @@ class Cannonball(pygame.sprite.Sprite):
         self.exploding = False
         self.position = p1
         (x,y) = p1.get()
-        self.rect.x = x
-        self.rect.y = y
+        self.x = x
+        self.y = y
         
     def in_air(self):
         '''
@@ -348,8 +350,8 @@ class Cannonball(pygame.sprite.Sprite):
         if self._shoot and not self.exploding:
             self.increment()
             (x,y) = self.position.get()
-            self.rect.x = x
-            self.rect.y = y
+            self.x = x
+            self.y = y
     
     def draw(self, surface):
         '''
@@ -359,9 +361,12 @@ class Cannonball(pygame.sprite.Sprite):
         Returns:
             None
         '''
+        point = (int(self.x), int(self.y))
         if not self.exploding:
-            surface_blit = surface.blit
-            surface_blit(self.image, self.rect)
+            pygame.draw.circle(surface, self.color.black,
+                               point, 5, 0)
+            pygame.draw.circle(surface, self.color.red,
+                               point, 2, 0)
         else:
             self.bomb.update()
             self.bomb.draw(surface)
@@ -389,8 +394,8 @@ class testCannonball(unittest.TestCase):
         self.assertEqual(self.ball.end,self.end)
         self.assertEqual(self.ball.position,self.start)
         (x,y) = self.start.get()
-        self.assertEqual(self.ball.rect.x,x)
-        self.assertEqual(self.ball.rect.y,y)
+        self.assertEqual(self.ball.x, x)
+        self.assertEqual(self.ball.y, y)
 
     def test_in_air(self):
         self.assertEqual(self.ball.in_air(), False)

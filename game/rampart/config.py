@@ -35,6 +35,7 @@ LIVES = 3
 NONPLAYER = 0
 PLAYERONE = 1
 PLAYERTWO = 2
+ARC = 30
 
 '''
 Explosion Images
