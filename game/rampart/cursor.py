@@ -6,7 +6,6 @@
 @note: This class is used for rampart game
 '''
 import pygame
-import rampart.helper as helper
 from rampart.color import Color
 
 class Cursor(pygame.sprite.Sprite):
