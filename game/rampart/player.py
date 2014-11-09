@@ -12,6 +12,7 @@ from rampart.point import Point
 from rampart.cursor import Cursor
 from rampart.piece import Piece
 from rampart.color import Color
+from rampart.castle_draw import draw_castle
 class Player():
     def __init__(self, iid=None, point=None, color=None):
         '''
@@ -90,6 +91,9 @@ class Player():
         Returns:
             None
         '''
+        for castle in self.towers:
+            (x, y) = castle.get()
+            draw_castle(surface, x, y, self.color)
         if self.mode == SHOOTING:
             for ball in self.cannonballs:
                 self.cannonballs[ball].draw(surface)
