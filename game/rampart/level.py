@@ -246,7 +246,27 @@ class Level():
         return added
 
     def update(self):
+        '''
+        a method to update the level
+        Parameters:
+            None:
+        Returns:
+            None
+        '''
         self.graph.paint()
+
+    def add_players_castles(self, player):
+        '''
+        a method that takes the levels castles and adds them to the player
+        Parameters:
+            player: the player to add to (Player)
+        Returns:
+            None
+        '''
+        for node in self.graph.iterate():
+            if node.get_type() == CASTLE:
+                self.player.add_castle(node)
+        return
 
 from rampart.config import CASTLE_SPOTS
 def castle_spot(row, column):

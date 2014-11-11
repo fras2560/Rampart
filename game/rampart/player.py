@@ -6,13 +6,18 @@
 @note: This class is used for rampart game
 '''
 import pygame
-from rampart.config import CASTLE, CANNON, LIVES, BUILDING, SHOOTING, NOMODE
+from rampart.config import CASTLE, CANNON, LIVES, BUILDING
+from rampart.config import SHOOTING, NOMODE, NODE_SIZE
+from rampart.config import SHOOT, MOVE_UP, MOVE_DOWN, MOVE_LEFT, MOVE_RIGHT
+from rampart.config import UP, DOWN, LEFT, RIGHT, LAY_PIECE, SPEED
+
 from rampart.cannonball import Cannonball
 from rampart.point import Point
 from rampart.cursor import Cursor
 from rampart.piece import Piece
 from rampart.color import Color
 from rampart.castle_draw import draw_castle
+
 class Player():
     def __init__(self, iid=None, point=None, color=None):
         '''
@@ -48,6 +53,7 @@ class Player():
         if color is None:
             color = Color().blue
         self.color = color
+        self.controls = {}
 
     def reset(self):
         '''
@@ -68,9 +74,29 @@ class Player():
         Parameters:
             castle: the castle node object (Node)
         Returns:
-            None
+            add:True if added, False otherwise (boolean)
         '''
-        self.towers.append(castle)
+        add = True
+        for tower in self.towers:
+            if self.adjacent(tower.get(), castle.get()):
+                add = False
+                break
+        if add:
+            self.towers.append(castle)
+        return add
+
+    def adjacent(self, p1, p2):
+        '''
+        a method that determines if the two points are adjacent
+        Parameters:
+            p1: the first point (x,y)
+            p2: the second point (x,y)
+        Returns:
+            pair: True if adjacent, False otherwise (boolean)
+        '''
+        xcond = abs(p1[0] - p2[0]) <= NODE_SIZE
+        ycond = abs(p1[1] - p2[1]) <= NODE_SIZE
+        return xcond and ycond
 
     def add_cannon(self, cannon):
         '''
@@ -101,7 +127,6 @@ class Player():
         elif self.mode == BUILDING:
             self.piece.draw(surface, self.color)
 
-
     def shoot(self):
         '''
         a method for the player to shoot a cannonball at the specific position
@@ -128,6 +153,14 @@ class Player():
         return shot
 
     def move(self, horizontal=0, vertical=0):
+        '''
+        a method to move the player's piece or cursor
+        Parameters:
+            horizontal: the movement in the horizon (int)
+            vertical: the movement in the vertical (int)
+        Returns:
+            None
+        '''
         if self.mode == SHOOTING:
             self.cursor.move(horizontal, vertical)
         elif self.mode == BUILDING:
@@ -201,10 +234,48 @@ class Player():
         '''
         self.mode = NOMODE
 
+    def set_controls(self, controls):
+        '''
+        a method that sets the player controls
+        Parameters:
+            controls: a dictionary mapping key to event (dict)
+        Returns:
+            None
+        '''
+        self.controls = controls
+
+    def player_control(self, keys, level):
+        '''
+        a method that takes the key presses and determines the player move
+        Parameters:
+            keys: the keys pressed
+            level: the game level
+        Returns:
+            None
+        '''
+        for button, action in self.controls:
+            for key in keys:
+                if key[button]:
+                    if self.mode == SHOOTING:
+                        if action == SHOOT:
+                            self.shoot()
+                    elif self.mode == BUILDING:
+                        if action == LAY_PIECE:
+                            level.add_piece(self)
+                    if action == MOVE_UP:
+                        self.move(vertical = UP * SPEED)
+                    elif action == MOVE_DOWN:
+                        self.move(vertical = DOWN * SPEED)
+                    elif action == MOVE_RIGHT:
+                        self.move(horizontal = RIGHT * SPEED)
+                    elif action == MOVE_LEFT: 
+                        self.move(horizontal = LEFT * SPEED)
+        return
+
 import unittest
 from graph.node import Node
 from graph.terrain import Terrain
-from rampart.config import NODE_SIZE, TERRAIN_TO_FILE, BACKGROUND
+from rampart.config import TERRAIN_TO_FILE, BACKGROUND
 class PlayerTest(unittest.TestCase):
     def setUp(self):
         pygame.init()
@@ -226,7 +297,26 @@ class PlayerTest(unittest.TestCase):
         y = 0
         castle = Node(x=x, y=y, terrain=CASTLE,
                       player=1, images=self.terrain)
-        self.player.add_castle(castle)
+        added = self.player.add_castle(castle)
+        self.assertEqual(added, True)
+        added = self.player.add_castle(castle)
+        self.assertEqual(added, False)
+
+    def testAdjacent(self):
+        result = self.player.adjacent((0,0), (0,0))
+        self.assertEqual(True, result)
+        result = self.player.adjacent((0,0), (10,0))
+        self.assertEqual(True, result)
+        result = self.player.adjacent((0,0), (0,10))
+        self.assertEqual(True, result)
+        result = self.player.adjacent((0,0), (10,10))
+        self.assertEqual(True, result)
+        result = self.player.adjacent((0,0), (11,0))
+        self.assertEqual(False, result)
+        result = self.player.adjacent((0,0), (0,11))
+        self.assertEqual(False, result)
+        result = self.player.adjacent((0,0), (11,11))
+        self.assertEqual(False, result)
 
     def addCannon(self, x=None, y=None):
         if x is None:
