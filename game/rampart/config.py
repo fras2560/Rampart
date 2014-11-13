@@ -27,6 +27,8 @@ MOVE_RIGHT = 2
 MOVE_DOWN = 3
 MOVE_LEFT = 4
 LAY_PIECE = 5
+ROTATE_RIGHT = 6
+ROTATE_LEFT = 7
 NO_MOVE = 0
 CLOCKWISE = -pi/2
 COUNTER_CLOCKWISE = pi/2
@@ -47,9 +49,9 @@ PLAYERONE = 1
 PLAYERTWO = 2
 ARC = 30
 PLAYERCOLORS = [
-                ( 255,   0,   0)
-                (  13,   0, 252)
-                ( 252, 130,   0)
+                ( 255,   0,   0),
+                (  13,   0, 252),
+                ( 252, 130,   0),
                ]
 '''
 Explosion Images
