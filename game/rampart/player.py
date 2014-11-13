@@ -6,11 +6,18 @@
 @note: This class is used for rampart game
 '''
 import pygame
+'''
+-------------------------------------------------------------------------------
+All constants from config
+-------------------------------------------------------------------------------
+'''
 from rampart.config import CASTLE, CANNON, LIVES, BUILDING
-from rampart.config import SHOOTING, NOMODE, NODE_SIZE
+from rampart.config import SHOOTING, NOMODE, NODE_SIZE, ROTATE_RIGHT
 from rampart.config import SHOOT, MOVE_UP, MOVE_DOWN, MOVE_LEFT, MOVE_RIGHT
-from rampart.config import UP, DOWN, LEFT, RIGHT, LAY_PIECE, SPEED
-
+from rampart.config import UP, DOWN, LEFT, RIGHT, LAY_PIECE, SPEED, ROTATE_LEFT
+'''
+-------------------------------------------------------------------------------
+'''
 from rampart.cannonball import Cannonball
 from rampart.point import Point
 from rampart.cursor import Cursor
@@ -253,31 +260,40 @@ class Player():
         Returns:
             None
         '''
-        for button, action in self.controls:
-            for key in keys:
-                if key[button]:
-                    if self.mode == SHOOTING:
-                        if action == SHOOT:
-                            self.shoot()
-                    elif self.mode == BUILDING:
-                        if action == LAY_PIECE:
-                            level.add_piece(self)
-                    if action == MOVE_UP:
-                        self.move(vertical = UP * SPEED)
-                    elif action == MOVE_DOWN:
-                        self.move(vertical = DOWN * SPEED)
-                    elif action == MOVE_RIGHT:
-                        self.move(horizontal = RIGHT * SPEED)
-                    elif action == MOVE_LEFT: 
-                        self.move(horizontal = LEFT * SPEED)
+        for action, button in self.controls.items():
+            if keys[button]:
+                if self.mode == SHOOTING:
+                    if action == SHOOT:
+                        self.shoot()
+                elif self.mode == BUILDING:
+                    if action == LAY_PIECE:
+                        level.add_piece(self)
+                    elif action == ROTATE_RIGHT:
+                        self.piece.clockwise_turn()
+                    elif action == ROTATE_LEFT:
+                        self.piece.counter_clockwise_turn()
+                if action == MOVE_UP:
+                    self.move(vertical = UP * SPEED)
+                elif action == MOVE_DOWN:
+                    self.move(vertical = DOWN * SPEED)
+                elif action == MOVE_RIGHT:
+                    self.move(horizontal = RIGHT * SPEED)
+                elif action == MOVE_LEFT: 
+                    self.move(horizontal = LEFT * SPEED)
         return
 
 import unittest
 from graph.node import Node
 from graph.terrain import Terrain
 from rampart.config import TERRAIN_TO_FILE, BACKGROUND
+from rampart.level import Level
+import os
+import logging
 class PlayerTest(unittest.TestCase):
     def setUp(self):
+        logging.basicConfig(level=logging.DEBUG,
+                            format='%(asctime)s %(message)s')
+        self.logger = logging.getLogger(__name__)
         pygame.init()
         self.screen = pygame.display.set_mode((200, 200))
         pygame.display.set_caption("Test Player Object")
@@ -369,3 +385,128 @@ class PlayerTest(unittest.TestCase):
             self.player.draw(self.screen)
             delete = self.player.update()
         self.assertEqual(delete, [(10, 10.0)])
+
+class PlayerControlTest(unittest.TestCase):
+    def setUp(self):
+        logging.basicConfig(level=logging.DEBUG,
+                            format='%(asctime)s %(message)s')
+        self.logger = logging.getLogger(__name__)
+        pygame.init()
+        self.screen = pygame.display.set_mode((200, 200))
+        pygame.display.set_caption("Test Player Object")
+        self.color = Color()
+        self.screen.fill(self.color.white)
+        self.terrain = Terrain(TERRAIN_TO_FILE, NODE_SIZE, BACKGROUND)
+        self.player = Player()
+        directory = os.path.dirname(os.getcwd())
+        self.directory = os.path.join(directory, 'levels')
+        self.fp = os.path.join(self.directory, 'test.txt')
+        self.level = Level(self.fp, logger=self.logger, testing=True)
+        controls = {
+                    MOVE_UP: pygame.K_UP,
+                    MOVE_DOWN: pygame.K_DOWN,
+                    MOVE_RIGHT: pygame.K_RIGHT,
+                    MOVE_LEFT: pygame.K_LEFT,
+                    SHOOT: pygame.K_w,
+                    LAY_PIECE: pygame.K_w,
+                    ROTATE_RIGHT: pygame.K_d,
+                    ROTATE_LEFT: pygame.K_a
+                    }
+        self.player.set_controls(controls)
+        self.keys = [
+                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                     0, 0, 0
+                     ]
+
+    def testMovePieceUp(self):
+        self.keys[pygame.K_UP] = 1
+        before = self.player.piece.return_points()
+        self.player.player_control(self.keys, self.level)
+        result = self.player.piece.return_points()
+        self.assertNotEqual(before, result)
+        for i in range(0, len(result)):
+            self.assertEqual(before[i][1] + UP * SPEED, result[i][1])
+
+    def testMovePieceDown(self):
+        self.keys[pygame.K_DOWN] = 1
+        before = self.player.piece.return_points()
+        self.player.player_control(self.keys, self.level)
+        result = self.player.piece.return_points()
+        self.assertNotEqual(before, result)
+        for i in range(0, len(result)):
+            self.assertEqual(before[i][1] + DOWN * SPEED, result[i][1])
+
+    def testMovePieceLeft(self):
+        self.keys[pygame.K_LEFT] = 1
+        before = self.player.piece.return_points()
+        self.player.player_control(self.keys, self.level)
+        result = self.player.piece.return_points()
+        self.assertNotEqual(before, result)
+        for i in range(0, len(result)):
+            self.assertEqual(before[i][0] + LEFT * SPEED, result[i][0])
+
+    def testMovePieceRight(self):
+        self.keys[pygame.K_RIGHT] = 1
+        before = self.player.piece.return_points()
+        self.player.player_control(self.keys, self.level)
+        result = self.player.piece.return_points()
+        self.assertNotEqual(before, result)
+        for i in range(0, len(result)):
+            self.assertEqual(before[i][0] + RIGHT * SPEED, result[i][0])
+
+    def testMove(self):
+        start = self.player.cursor.get()
+        # move it up
+        self.player.shoot_mode()
+        before = self.player.cursor.get()
+        self.keys[pygame.K_UP] = 1
+        self.player.player_control(self.keys, self.level)
+        result = self.player.cursor.get()
+        self.assertNotEqual(before, result)
+        self.assertEqual(before[1] + UP * SPEED, result[1])
+        # move it down
+        before = self.player.cursor.get()
+        self.keys[pygame.K_UP] = 0
+        self.keys[pygame.K_DOWN] = 1
+        self.player.player_control(self.keys, self.level)
+        result = self.player.cursor.get()
+        self.assertNotEqual(before, result)
+        self.assertEqual(before[1] + DOWN * SPEED, result[1])
+        # move it right
+        before = self.player.cursor.get()
+        self.keys[pygame.K_DOWN] = 0
+        self.keys[pygame.K_RIGHT] = 1
+        self.player.player_control(self.keys, self.level)
+        result = self.player.cursor.get()
+        self.assertNotEqual(before, result)
+        self.assertEqual(before[0] + RIGHT * SPEED, result[0])
+        #move it left
+        before = self.player.cursor.get()
+        self.keys[pygame.K_RIGHT] = 0
+        self.keys[pygame.K_LEFT] = 1
+        self.player.player_control(self.keys, self.level)
+        result = self.player.cursor.get()
+        self.assertNotEqual(before, result)
+        self.assertEqual(before[0] + LEFT * SPEED, result[0])
+        self.assertEqual(start, result)
+
+    def testShoot(self):
+        self.player.cursor.move(0, 10)
+        self.player.shoot_mode()
+        self.keys[pygame.K_w] = 0
+        self.player.player_control(self.keys, self.level)
