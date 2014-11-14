@@ -42,6 +42,7 @@ class Rampart():
             self.players.append(Player(iid=p_id, color=PLAYERCOLORS[p_id]))
         self.level = Level(level, logger=self.logger)
         self.build_mode()
+        self.play = True
 
     def display_clock(self):
         '''
@@ -62,6 +63,8 @@ class Rampart():
             Returns:
                 None
         '''
+        print("Draw")
+        self.screen.fill(self.color.white)
         self.level.draw(self.screen)
         for player in self.players:
             player.draw(self.screen)
@@ -88,6 +91,8 @@ class Rampart():
         '''
         keys = None
         for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                self.play = False
             if event.type == pygame.KEYDOWN:
                 key = pygame.key.get_pressed()
                 keys = key
@@ -112,13 +117,14 @@ class Rampart():
             Parameters:
                 None
             Returns:
-                None
+                True if game is still going, False otherwise (boolean)
         '''
         if self.clock == 0:
             self.switch_mode()
         self.tick()
         self.controls()
         self.draw()
+        return self.play
 
     def switch_mode(self):
         '''
