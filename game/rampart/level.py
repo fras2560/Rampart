@@ -265,7 +265,8 @@ class Level():
         '''
         for node in self.graph.iterate():
             if node.get_type() == CASTLE:
-                self.player.add_castle(node)
+                self.logger.debug("Adding castle to player")
+                player.add_castle(node)
         return
 
 from rampart.config import CASTLE_SPOTS
