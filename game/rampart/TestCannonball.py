@@ -11,6 +11,9 @@ from rampart.player import Player
 from point import Point
 from color import Color
 from config import  DOWN, UP, LEFT, RIGHT, BASE
+from config import MOVE_UP, MOVE_DOWN, MOVE_RIGHT, SHOOT, MOVE_LEFT
+from config import LAY_PIECE, ROTATE_RIGHT, ROTATE_LEFT
+
 SIZE = (500,500)
 class Tester():
     def __init__(self):
@@ -33,6 +36,17 @@ class Tester():
         self.player.shoot_mode()
         self.level.add_cannon(250, 250, self.player)
         self.level.add_cannon(260, 250, self.player)
+        controls = {
+                    MOVE_UP: pygame.K_UP,
+                    MOVE_DOWN: pygame.K_DOWN,
+                    MOVE_RIGHT: pygame.K_RIGHT,
+                    MOVE_LEFT: pygame.K_LEFT,
+                    SHOOT: pygame.K_w,
+                    LAY_PIECE: pygame.K_w,
+                    ROTATE_RIGHT: pygame.K_d,
+                    ROTATE_LEFT: pygame.K_a
+                    }
+        self.player.set_controls(controls)
 
     def main(self):
         done = False
@@ -44,20 +58,7 @@ class Tester():
                     __ = pygame.mouse.get_pos()
                 if event.type == pygame.KEYDOWN:
                     key = pygame.key.get_pressed()
-                    if key[pygame.K_SPACE]:
-                        self.player.shoot()
-                    if key[pygame.K_s]:
-                        self.speed = 20
-                    else:
-                        self.speed = 10
-                    if key[pygame.K_UP]:
-                        self.player.move(vertical=self.speed*UP)
-                    if key[pygame.K_DOWN]:
-                        self.player.move(vertical=self.speed*DOWN)
-                    if key[pygame.K_RIGHT]:
-                        self.player.move(horizontal=self.speed*RIGHT)
-                    if key[pygame.K_LEFT]:
-                        self.player.move(horizontal=self.speed*LEFT)
+                    self.player.player_control(key, self.level)
             self.screen.fill(self.color.white)
             self.player.update()
             self.level.draw(self.screen)
