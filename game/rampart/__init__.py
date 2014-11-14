@@ -14,7 +14,7 @@ Imports
 from rampart.config import BASE, PLAYERCOLORS, BUILDING, SHOOTING
 from rampart.config import BUILDTIME, SHOOTTIME, SIZE, NODE_SIZE
 from rampart.config import LEFT, RIGHT, UP, DOWN
-
+from rampart.color import Color
 from rampart.player import Player
 from rampart.level import Level
 import pygame
@@ -30,33 +30,216 @@ class Rampart():
         logging.basicConfig(filename="rampart.log", level=logging.INFO,
                             format='%(asctime)s %(message)s')
         self.logger = logging.getLogger(__name__)
+        pygame.init()
+        self.screen = pygame.display.set_mode(SIZE)
+        pygame.display.set_caption("Rampart")
+        pygame.key.set_repeat(1, 5)
+        self.header = pygame.font.SysFont("monospace", 36)
+        self.point = pygame.font.SysFont('monospace', 18)
+        self.color = Color()
         self.players = []
         for p_id in range(0, players):
             self.players.append(Player(iid=p_id, color=PLAYERCOLORS[p_id]))
         self.level = Level(level, logger=self.logger)
-        self.mode = BUILDING
-        self.time = BUILDTIME
-        pygame.init()
-        self.screen = pygame.display.set_mode(SIZE)
-        pygame.display.set_caption("Test Building")
-        pygame.key.set_repeat(1, 5)
-        self.header = pygame.font.SysFont("monospace", 36)
-        self.point = pygame.font.SysFont('monospace', 18)
+        self.build_mode()
 
     def display_clock(self):
+        '''
+            a method that display the game clock
+            Parameters:
+                None
+            Returns:
+                None
+        '''
         label = self.point.render("Time: %d" % self.clock, 2, self.color.black)
         self.screen.blit(label,(SIZE[0] // 2, 2 * NODE_SIZE))
 
     def draw(self):
+        '''
+            a method that draw the game
+            Parameters:
+                None
+            Returns:
+                None
+        '''
         self.level.draw(self.screen)
         for player in self.players:
             player.draw(self.screen)
         self.display_clock()
 
+    def set_player_controls(self, player, controls):
+        '''
+            a method that set the player controls of a certain player
+            Parameters:
+                player: the player to set (int)
+                controls: a dictionary of controls (dict)
+            Returns:
+                None
+        '''
+        self.players[player].set_controls(controls)
+
     def controls(self):
-        keys = []
+        '''
+            a method that deals with controls of the game
+            Parameters:
+                None
+            Returns:
+                None
+        '''
+        keys = None
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
                 key = pygame.key.get_pressed()
-                keys.append(key)
+                keys = key
+        if keys is not None:
+            for player in self.players:
+                player.player_controls(keys, self.level)
         return
+
+    def tick(self):
+        '''
+            a method that updates the clock of the game
+            Paramters:
+                None
+            Returns:
+                None
+        '''
+        self.clock -= 1
+
+    def game_tick(self):
+        '''
+            a method that is the driving force behind the game
+            Parameters:
+                None
+            Returns:
+                None
+        '''
+        if self.clock == 0:
+            self.switch_mode()
+        self.tick()
+        self.controls()
+        self.draw()
+
+    def switch_mode(self):
+        '''
+            a method that switchs the mode to the mode
+            Parameters:
+                None
+            Returns:
+                None
+        '''
+        if self.mode == BUILDING:
+            self.shoot_mode()
+        elif self.mode == SHOOTING:
+            self.build_mode()
+
+    def build_mode(self):
+        '''
+            a method that changes the game to build mode
+            Parameters:
+                None
+            Returns:
+                None
+        '''
+        for player in self.players:
+            player.build_mode()
+        self.clock = BUILDTIME
+        self.mode = BUILDING
+
+    def shoot_mode(self):
+        '''
+            a method that sets the game into shooting mode
+            Parameters:
+                None
+            Returns:
+                None
+        '''
+        for player in self.players:
+            player.shoot_mode()
+        self.clock = SHOOTTIME
+        self.mode = SHOOTING
+
+import unittest
+from rampart.config import BUILDINGBASE
+from config import MOVE_UP, MOVE_DOWN, MOVE_RIGHT, SHOOT, MOVE_LEFT
+from config import LAY_PIECE, ROTATE_RIGHT, ROTATE_LEFT
+
+class TestRampart(unittest.TestCase):
+    def setUp(self):
+        logging.basicConfig(level=logging.DEBUG,
+                            format='%(asctime)s %(message)s')
+        self.logger = logging.getLogger(__name__)
+        pygame.init()
+        self.color = Color()
+        self.screen = pygame.display.set_mode((200, 200))
+        pygame.display.set_caption("Test Rampart Object")
+        self.screen.fill(self.color.white)
+        self.rampart = Rampart(2, BUILDINGBASE)
+        controls = {
+            MOVE_UP: pygame.K_UP,
+            MOVE_DOWN: pygame.K_DOWN,
+            MOVE_RIGHT: pygame.K_RIGHT,
+            MOVE_LEFT: pygame.K_LEFT,
+            SHOOT: pygame.K_w,
+            LAY_PIECE: pygame.K_w,
+            ROTATE_RIGHT: pygame.K_d,
+            ROTATE_LEFT: pygame.K_a
+            }
+        self.rampart.set_player_controls(0, controls)
+        self.rampart.set_player_controls(1, {})
+        self.keys = [
+             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+             0, 0, 0
+             ]
+
+    def tearDown(self):
+        pygame.quit()
+
+    def testShootMode(self):
+        # initialize to build mode
+        self.rampart.shoot_mode()
+        after_clock = self.rampart.clock
+        self.assertEqual(after_clock, SHOOTTIME)
+        for player in self.rampart.players:
+            self.assertEqual(SHOOTING, player.mode)
+
+    def testBuildMode(self):
+        self.rampart.clock = 0
+        for player in self.rampart.players:
+            player.shoot_mode()
+        self.rampart.build_mode()
+        after_clock = self.rampart.clock
+        self.assertEqual(after_clock, BUILDTIME)
+        for player in self.rampart.players:
+            self.assertEqual(BUILDING, player.mode)
+
+    def testSwitchMode(self):
+        # initialized to shoot
+        before_type = self.rampart.players[0].mode
+        before_clock = self.rampart.clock
+        self.rampart.switch_mode()
+        self.assertEqual(self.rampart.players[0].mode, SHOOTING)
+        self.assertNotEqual(self.rampart.players[0].mode, before_type)
+        self.assertEqual(self.rampart.clock, SHOOTTIME)
+        self.assertNotEqual(self.rampart.clock, before_clock)
+        # now switch back
+        self.rampart.switch_mode()
+        self.assertEqual(self.rampart.players[0].mode, before_type)
+        self.assertNotEqual(self.rampart.players[0].mode, SHOOTING)
+        self.assertEqual(self.rampart.clock, before_clock)
+        self.assertNotEqual(self.rampart.clock, SHOOTTIME)
