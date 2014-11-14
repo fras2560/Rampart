@@ -285,7 +285,7 @@ class Player():
 import unittest
 from graph.node import Node
 from graph.terrain import Terrain
-from rampart.config import TERRAIN_TO_FILE, BACKGROUND
+from rampart.config import TERRAIN_TO_FILE, BACKGROUND, GRASS, BLOCK
 from rampart.level import Level
 import os
 import logging
@@ -469,7 +469,7 @@ class PlayerControlTest(unittest.TestCase):
         for i in range(0, len(result)):
             self.assertEqual(before[i][0] + RIGHT * SPEED, result[i][0])
 
-    def testMove(self):
+    def testMoveCursor(self):
         start = self.player.cursor.get()
         # move it up
         self.player.shoot_mode()
@@ -508,5 +508,43 @@ class PlayerControlTest(unittest.TestCase):
     def testShoot(self):
         self.player.cursor.move(0, 10)
         self.player.shoot_mode()
-        self.keys[pygame.K_w] = 0
+        self.keys[pygame.K_w] = 1
         self.player.player_control(self.keys, self.level)
+        self.assertEqual({}, self.player.cannonballs)
+        castle = Node(x=0, y=0, terrain=CANNON,
+                      player=1, images=self.terrain)
+        self.player.add_cannon(castle)
+        self.player.player_control(self.keys, self.level)
+        expect = {}
+        expect[(0, 0)] = self.player.cannonballs[(0, 0)]
+        self.assertEqual(expect, self.player.cannonballs)
+
+    def testRotate(self):
+        # rotate right
+        self.player.build_mode()
+        self.keys[pygame.K_d] = 1
+        self.player.piece.reset()
+        self.player.piece._L_piece()
+        before = self.player.piece.return_points()
+        self.player.player_control(self.keys, self.level)
+        after = self.player.piece.return_points()
+        self.assertNotEqual(before, after)
+        expect = [(0, 0), (-10, 0), (10, 0), (-10, -10)]
+        self.assertEqual(expect, after)
+        # rotate back
+        self.keys[pygame.K_d] = 0
+        self.keys[pygame.K_a] = 1
+        self.player.player_control(self.keys, self.level)
+        final_pos = self.player.piece.return_points()
+        self.assertNotEqual(final_pos, after)
+        self.assertEqual(final_pos, before)
+
+    def testLay(self):
+        self.player.build_mode()
+        self.keys[pygame.K_w] = 1
+        self.player.piece.reset()
+        self.player.piece._O_piece()
+        self.player.player_control(self.keys, self.level)
+        test = self.level.graph.get_node(0, 0)
+        self.assertEqual(test.get_type(), BLOCK)
+        self.assertNotEqual(test.get_type(), GRASS)
