@@ -36,7 +36,7 @@ COUNTER_CLOCKWISE = pi/2
 '''
 Game Modes and Constants
 '''
-SPEED = 5
+SPEED = 10
 BUILDTIME = 30
 SHOOTTIME = 20
 BUILDING = 0
@@ -83,6 +83,8 @@ I_CASTLE_2 = 'castle_2.png'
 I_CASTLE_3 = 'castle_3.png'
 I_BLOCK = 'wall.png'
 BASE = os.path.join(os.path.dirname(os.getcwd()),'levels', 'base.txt')
+BUILDINGBASE = os.path.join(os.path.dirname(os.getcwd()),'levels',
+                            'test-building-map.txt')
 CASTLE_SPOTS= [(0, 0), (0, 1), (1, 0), (1,1), (0, 2), (1, 2)]
 '''
 Node Types, Constants, and Indexes
