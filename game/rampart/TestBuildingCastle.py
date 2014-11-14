@@ -10,7 +10,10 @@ from rampart.level import Level
 from rampart.player import Player
 from point import Point
 from color import Color
-from config import  DOWN, UP, LEFT, RIGHT, BASE, NODE_SIZE
+from config import BUILDINGBASE
+from config import MOVE_UP, MOVE_DOWN, MOVE_RIGHT, SHOOT, MOVE_LEFT
+from config import LAY_PIECE, ROTATE_RIGHT, ROTATE_LEFT
+
 SIZE = (500,500)
 
 class Tester():
@@ -29,9 +32,21 @@ class Tester():
         self.sec.set(x=SIZE[0]/2+15, y=SIZE[1]/2)
         self.clock = pygame.time.Clock()
         self.speed = 1
-        self.level = Level(BASE)
+        self.level = Level(BUILDINGBASE)
         self.level.update()
         self.player = Player(1, self.center)
+        self.level.add_players_castles(self.player)
+        controls = {
+                    MOVE_UP: pygame.K_UP,
+                    MOVE_DOWN: pygame.K_DOWN,
+                    MOVE_RIGHT: pygame.K_RIGHT,
+                    MOVE_LEFT: pygame.K_LEFT,
+                    SHOOT: pygame.K_w,
+                    LAY_PIECE: pygame.K_w,
+                    ROTATE_RIGHT: pygame.K_d,
+                    ROTATE_LEFT: pygame.K_a
+                    }
+        self.player.set_controls(controls)
 
     def main(self):
         done = False
@@ -43,22 +58,7 @@ class Tester():
                     __ = pygame.mouse.get_pos()
                 if event.type == pygame.KEYDOWN:
                     key = pygame.key.get_pressed()
-                    if key[pygame.K_SPACE]:
-                        added = self.level.add_piece(self.player)
-                        if added:
-                            self.player.piece.create_piece()
-                    if key[pygame.K_UP]:
-                        self.player.move(vertical=UP*NODE_SIZE)
-                    if key[pygame.K_DOWN]:
-                        self.player.move(vertical=DOWN*NODE_SIZE)
-                    if key[pygame.K_RIGHT]:
-                        self.player.move(horizontal=RIGHT*NODE_SIZE)
-                    if key[pygame.K_LEFT]:
-                        self.player.move(horizontal=LEFT*NODE_SIZE)
-                    if key[pygame.K_w]:
-                        self.player.piece.counter_clockwise_turn()
-                    if key[pygame.K_s]:
-                        self.player.piece.clockwise_turn()
+                    self.player.player_control(key, self.level)
             self.level.update()
             self.screen.fill(self.color.white)
             self.player.update()
