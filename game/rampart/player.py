@@ -101,7 +101,7 @@ class Player():
         Returns:
             pair: True if adjacent, False otherwise (boolean)
         '''
-        xcond = abs(p1[0] - p2[0]) <= NODE_SIZE
+        xcond = abs(p1[0] - p2[0]) <= 2 * NODE_SIZE
         ycond = abs(p1[1] - p2[1]) <= NODE_SIZE
         return xcond and ycond
 
