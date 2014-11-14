@@ -267,7 +267,9 @@ class Player():
                         self.shoot()
                 elif self.mode == BUILDING:
                     if action == LAY_PIECE:
-                        level.add_piece(self)
+                        added = level.add_piece(self)
+                        if added:
+                            self.piece.create_piece()
                     elif action == ROTATE_RIGHT:
                         self.piece.clockwise_turn()
                     elif action == ROTATE_LEFT:
