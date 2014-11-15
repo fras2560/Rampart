@@ -8,9 +8,9 @@
 from rampart import Rampart
 from rampart.controls import PLAYERONE
 import os
-level = os.path.join(os.getcwd(), 'levels', 'test-building-map.txt')
+level = os.path.join(os.getcwd(), 'levels', 'LevelOne.txt')
 game = Rampart(2, level)
-game.set_player_controls(0, PLAYERONE)
+game.set_player_controls(1, PLAYERONE)
 play = True
 while play:
     play = game.game_tick()

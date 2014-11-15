@@ -27,7 +27,7 @@ class Rampart():
             players: the number of players (int)
             level: the level to player (filepath)
         '''
-        logging.basicConfig(filename="rampart.log", level=logging.INFO,
+        logging.basicConfig(level=logging.INFO,
                             format='%(asctime)s %(message)s')
         self.logger = logging.getLogger(__name__)
         pygame.init()
@@ -39,9 +39,9 @@ class Rampart():
         self.color = Color()
         self.players = []
         self.level = Level(level, logger=self.logger)
-        for p_id in range(0, players):
-            self.players.append(Player(iid=p_id, color=PLAYERCOLORS[p_id]))
-            self.level.add_players_castles(self.players[p_id])
+        for p_id in range(1, players+1):
+            self.players.append(Player(iid=p_id, color=PLAYERCOLORS[p_id - 1]))
+            self.level.add_players_castles(self.players[p_id - 1])
         self.build_mode()
         self.clock = BUILDTIME
         self.play = True
@@ -83,7 +83,7 @@ class Rampart():
             Returns:
                 None
         '''
-        self.players[player].set_controls(controls)
+        self.players[player - 1].set_controls(controls)
 
     def controls(self):
         '''

@@ -60,6 +60,7 @@ class Player():
         if color is None:
             color = Color().blue
         self.color = color
+        print("")
         self.controls = {}
 
     def reset(self):
@@ -269,7 +270,9 @@ class Player():
                     if action == LAY_PIECE:
                         added = level.add_piece(self)
                         if added:
+                            pos = self.piece.return_points()[0]
                             self.piece.create_piece()
+                            self.piece.translate(pos[0], pos[1])
                     elif action == ROTATE_RIGHT:
                         self.piece.clockwise_turn()
                     elif action == ROTATE_LEFT:

@@ -263,9 +263,11 @@ class Level():
         Returns:
             None
         '''
+        pid = player.get_id()
+        self.logger.info("Adding Castles to player: %d" % pid)
         for node in self.graph.iterate():
-            if node.get_type() == CASTLE:
-                self.logger.debug("Adding castle to player")
+            right_player = node.get_player() == pid
+            if node.get_type() == CASTLE and right_player:
                 player.add_castle(node)
         return
 
