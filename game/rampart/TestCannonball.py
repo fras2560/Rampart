@@ -10,7 +10,7 @@ from rampart.level import Level
 from rampart.player import Player
 from point import Point
 from color import Color
-from config import  DOWN, UP, LEFT, RIGHT, BASE
+from config import BASE
 from config import MOVE_UP, MOVE_DOWN, MOVE_RIGHT, SHOOT, MOVE_LEFT
 from config import LAY_PIECE, ROTATE_RIGHT, ROTATE_LEFT
 
