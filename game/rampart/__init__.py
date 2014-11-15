@@ -38,11 +38,14 @@ class Rampart():
         self.point = pygame.font.SysFont('monospace', 18)
         self.color = Color()
         self.players = []
+        self.level = Level(level, logger=self.logger)
         for p_id in range(0, players):
             self.players.append(Player(iid=p_id, color=PLAYERCOLORS[p_id]))
-        self.level = Level(level, logger=self.logger)
+            self.level.add_players_castles(self.players[p_id])
         self.build_mode()
+        self.clock = BUILDTIME
         self.play = True
+        self.heart = pygame.time.Clock()
 
     def display_clock(self):
         '''
@@ -52,7 +55,8 @@ class Rampart():
             Returns:
                 None
         '''
-        label = self.point.render("Time: %d" % self.clock, 2, self.color.black)
+        label = self.point.render("Time: %d" % (self.clock //10),
+                                  2, self.color.black)
         self.screen.blit(label,(SIZE[0] // 2, 2 * NODE_SIZE))
 
     def draw(self):
@@ -63,12 +67,12 @@ class Rampart():
             Returns:
                 None
         '''
-        print("Draw")
         self.screen.fill(self.color.white)
         self.level.draw(self.screen)
         for player in self.players:
             player.draw(self.screen)
         self.display_clock()
+        pygame.display.flip()
 
     def set_player_controls(self, player, controls):
         '''
@@ -93,12 +97,13 @@ class Rampart():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.play = False
+                pygame.quit()
             if event.type == pygame.KEYDOWN:
                 key = pygame.key.get_pressed()
                 keys = key
         if keys is not None:
             for player in self.players:
-                player.player_controls(keys, self.level)
+                player.player_control(keys, self.level)
         return
 
     def tick(self):
@@ -110,6 +115,9 @@ class Rampart():
                 None
         '''
         self.clock -= 1
+        self.level.update()
+        for p in self.players:
+            p.update()
 
     def game_tick(self):
         '''
@@ -119,11 +127,13 @@ class Rampart():
             Returns:
                 True if game is still going, False otherwise (boolean)
         '''
-        if self.clock == 0:
-            self.switch_mode()
-        self.tick()
         self.controls()
-        self.draw()
+        if self.play:
+            if self.clock == 0:
+                self.switch_mode()
+            self.tick()
+            self.draw()
+            self.heart.tick(10)
         return self.play
 
     def switch_mode(self):

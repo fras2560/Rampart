@@ -6,12 +6,11 @@
 @note: Used to create the game
 '''
 from rampart import Rampart
-from rampart.config import BUILDINGBASE
-import pygame
+from rampart.controls import PLAYERONE
 import os
 level = os.path.join(os.getcwd(), 'levels', 'test-building-map.txt')
 game = Rampart(2, level)
+game.set_player_controls(0, PLAYERONE)
 play = True
 while play:
     play = game.game_tick()
-pygame.quit()
