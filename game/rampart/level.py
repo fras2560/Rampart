@@ -105,6 +105,7 @@ class Level():
             x: the x position on the screen (int)
             y: the y position on the screen (int)
             terrain: the terrain type (int)
+            player: the player the node belongs to (Player)
         Returns:
             None
         '''
@@ -361,7 +362,7 @@ class Test(unittest.TestCase):
         added = self.level.add_piece(player)
         self.assertEqual(added, False)
 
-    def testAddCannon(self):
+    def testAddCannonSimple(self):
         player = Player()
         added = self.level.add_cannon(-10, -10, player, game=False)
         self.assertEqual(added, False)
@@ -377,6 +378,25 @@ class Test(unittest.TestCase):
         self.assertEqual(added, True)
         added = self.level.add_cannon(0, 0, player, game=False)
         self.assertEqual(added, False)
+
+    def testAddCannonComplex(self):
+        # not surronded by wall
+        player = Player()
+        added = self.level.add_cannon(10, 10, player)
+        self.assertEqual(added, False)
+        # build the wall around it
+        self.level.update_node(0, 0, BLOCK)
+        self.level.update_node(10, 0, BLOCK)
+        self.level.update_node(20, 0, BLOCK)
+        self.level.update_node(0, 10, BLOCK)
+        # self.level.update_node(10, 10, BLOCK)
+        self.level.update_node(20, 10, BLOCK)
+        self.level.update_node(0, 20, BLOCK)
+        self.level.update_node(10, 20, BLOCK)
+        self.level.update_node(20, 20, BLOCK)
+        self.level.update()
+        added = self.level.add_cannon(10, 10, player)
+        self.assertEqual(added, True)
 
     def testCheckCastle(self):
         result = self.level.check_castle(0, 0)
