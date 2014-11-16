@@ -176,13 +176,14 @@ class Level():
         self.logger.info("Add castle: %s" % valid)
         return valid
 
-    def add_cannon(self, x, y, player):
+    def add_cannon(self, x, y, player, game=True):
         '''
         a method to add a cannon to the level and the player
         Parameters:
             x: the x position (int)
             y: the y position (int)
             player: the player cannon (player)
+            game: True if part of game, False if want to add manually
         Returns:
             True if cannon was added
             False otherwise
@@ -197,6 +198,8 @@ class Level():
             column = x // NODE_SIZE
             node = self.graph.get_node(row, column)
             if node.get_type() not in CANBUILD:
+                add = False
+            if game and node.is_painted():
                 add = False
         except:
             add = False
@@ -353,26 +356,26 @@ class Test(unittest.TestCase):
         self.assertEqual(added, False)
         piece.translate(NODE_SIZE, NODE_SIZE)
         added = self.level.add_piece(player)
-        self.assertEqual(added, False)
+        self.assertEqual(added, True)
         piece.translate(NODE_SIZE, NODE_SIZE)
         added = self.level.add_piece(player)
-        self.assertEqual(added, True)
+        self.assertEqual(added, False)
 
     def testAddCannon(self):
         player = Player()
-        added = self.level.add_cannon(-10, -10, player)
+        added = self.level.add_cannon(-10, -10, player, game=False)
         self.assertEqual(added, False)
-        added = self.level.add_cannon(0, -10, player)
+        added = self.level.add_cannon(0, -10, player, game=False)
         self.assertEqual(added, False)
-        added = self.level.add_cannon(-10, 0, player)
+        added = self.level.add_cannon(-10, 0, player, game=False)
         self.assertEqual(added, False)
-        added = self.level.add_cannon(300, 0, player)
+        added = self.level.add_cannon(300, 0, player, game=False)
         self.assertEqual(added, False)
-        added = self.level.add_cannon(0, 300, player)
+        added = self.level.add_cannon(0, 300, player, game=False)
         self.assertEqual(added, False)
-        added = self.level.add_cannon(0, 0, player)
+        added = self.level.add_cannon(0, 0, player, game=False)
         self.assertEqual(added, True)
-        added = self.level.add_cannon(0, 0, player)
+        added = self.level.add_cannon(0, 0, player, game=False)
         self.assertEqual(added, False)
 
     def testCheckCastle(self):
