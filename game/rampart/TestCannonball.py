@@ -34,8 +34,10 @@ class Tester():
         self.level = Level(BASE)
         self.player = Player(1, self.center)
         self.player.shoot_mode()
-        self.level.add_cannon(250, 250, self.player)
-        self.level.add_cannon(260, 250, self.player)
+        self.level.add_cannon(250, 250, self.player, game=False)
+        self.level.add_cannon(260, 250, self.player, game=False)
+        for gun in self.player.guns:
+            gun.unpaint()
         controls = {
                     MOVE_UP: pygame.K_UP,
                     MOVE_DOWN: pygame.K_DOWN,
