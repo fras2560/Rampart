@@ -196,7 +196,6 @@ class Equation():
             elif not right and not up:
                 mid_y -= distance
                 mid_x -= distance
-        print(distance, mid_x, mid_y)
         #set the the step size
         self.step = 1 / float(euclidean) * self.velocity
         # add the three points
