@@ -11,7 +11,7 @@ import pygame
 All constants from config
 -------------------------------------------------------------------------------
 '''
-from rampart.config import CASTLE, CANNON, LIVES, BUILDING
+from rampart.config import CASTLE, CANNON, LIVES, BUILDING, PLACING
 from rampart.config import SHOOTING, NOMODE, NODE_SIZE, ROTATE_RIGHT
 from rampart.config import SHOOT, MOVE_UP, MOVE_DOWN, MOVE_LEFT, MOVE_RIGHT
 from rampart.config import UP, DOWN, LEFT, RIGHT, LAY_PIECE, SPEED, ROTATE_LEFT
@@ -60,8 +60,13 @@ class Player():
         if color is None:
             color = Color().blue
         self.color = color
-        print("")
         self.controls = {}
+        self.available_cannons = 0
+
+    def check_castles(self):
+        for tower in self.towers:
+            if not tower.is_painted():
+                self.available_cannons += 1
 
     def reset(self):
         '''
@@ -134,6 +139,11 @@ class Player():
             self.cursor.draw(surface)
         elif self.mode == BUILDING:
             self.piece.draw(surface, self.color)
+        elif self.mode == PLACING:
+            if self.available_cannons > 0:
+                (x, y) = self.cursor.get()
+                r = (x, y, NODE_SIZE, NODE_SIZE)
+                pygame.draw.rect(surface, self.color.grey, r)
 
     def shoot(self):
         '''
@@ -147,7 +157,7 @@ class Player():
         if self.mode == SHOOTING:
             for cannon in self.guns:
                 position = cannon.get()
-                if position not in self.cannonballs:
+                if not cannon.is_painted() and position not in self.cannonballs:
                     ball = Cannonball()
                     p1 = Point()
                     p1.set(position[0], position[1])
@@ -173,6 +183,8 @@ class Player():
             self.cursor.move(horizontal, vertical)
         elif self.mode == BUILDING:
             self.piece.translate(horizontal, vertical)
+        elif self.mode == PLACING:
+            self.cursor.move(horizontal, vertical)
 
     def update(self):
         ''''
@@ -238,9 +250,20 @@ class Player():
         a method used to change the player's mode to normal
         Parameters:
             None
-        Returns: None
+        Returns:
+            None
         '''
         self.mode = NOMODE
+
+    def place_mode(self):
+        '''
+        a method used to change the player's mode to placing (cannons)
+        Parameters:
+            None
+        Returns:
+            None
+        '''
+        self.mode = PLACING
 
     def set_controls(self, controls):
         '''
@@ -277,6 +300,12 @@ class Player():
                         self.piece.clockwise_turn()
                     elif action == ROTATE_LEFT:
                         self.piece.counter_clockwise_turn()
+                elif self.mode == PLACING:
+                    if self.action == LAY_PIECE and self.available_cannons > 0:
+                        (x, y) = self.cursor.get()
+                        added = level.add_cannon(x, y, self)
+                        if added:
+                            self.available_cannons -= 1
                 if action == MOVE_UP:
                     self.move(vertical = UP * SPEED)
                 elif action == MOVE_DOWN:
@@ -332,11 +361,11 @@ class PlayerTest(unittest.TestCase):
         self.assertEqual(True, result)
         result = self.player.adjacent((0,0), (10,10))
         self.assertEqual(True, result)
-        result = self.player.adjacent((0,0), (11,0))
+        result = self.player.adjacent((0,0), (21,0))
         self.assertEqual(False, result)
-        result = self.player.adjacent((0,0), (0,11))
+        result = self.player.adjacent((0,0), (0,21))
         self.assertEqual(False, result)
-        result = self.player.adjacent((0,0), (11,11))
+        result = self.player.adjacent((0,0), (21,21))
         self.assertEqual(False, result)
 
     def addCannon(self, x=None, y=None):
@@ -344,9 +373,9 @@ class PlayerTest(unittest.TestCase):
             x = 0
         if y is None:
             y = 0
-        castle = Node(x=x, y=y, terrain=CANNON,
+        cannon = Node(x=x, y=y, terrain=CANNON,
                       player=1, images=self.terrain)
-        self.player.add_cannon(castle)
+        self.player.add_cannon(cannon)
 
     def testAddCastle(self):
         self.addCastle()
@@ -366,10 +395,16 @@ class PlayerTest(unittest.TestCase):
     def testShoot(self):
         self.addCannon()
         self.addCannon(x=10, y=10)
+        # initally painted (not available)
         noshot = self.player.shoot()
         self.assertEqual(noshot, False)
         self.player.shoot_mode()
         self.player.move(10, 0)
+        noshot = self.player.shoot()
+        self.assertEqual(noshot, False)
+        # now unpaint them
+        for cannon in self.player.guns:
+            cannon.unpaint()
         shot1 = self.player.shoot()
         self.player.move(90, 90)
         shot2 = self.player.shoot()
@@ -383,13 +418,16 @@ class PlayerTest(unittest.TestCase):
         self.player.shoot_mode()
         self.addCannon()
         self.addCannon(x=10, y=10)
+        # now unpaint them
+        for cannon in self.player.guns:
+            cannon.unpaint()
         self.player.move(10, 10)
         __shot1 = self.player.shoot()
         delete = self.player.update()
         while delete == []:
             self.player.draw(self.screen)
             delete = self.player.update()
-        self.assertEqual(delete, [(10, 10.0)])
+        self.assertNotEqual(delete, [(0, 0)])
 
 class PlayerControlTest(unittest.TestCase):
     def setUp(self):
@@ -553,3 +591,11 @@ class PlayerControlTest(unittest.TestCase):
         test = self.level.graph.get_node(0, 0)
         self.assertEqual(test.get_type(), BLOCK)
         self.assertNotEqual(test.get_type(), GRASS)
+
+    def testAddCastle(self):
+        self.player.place_mode()
+        self.keys[pygame.K_w] = 1
+        self.player.cursor.move(10, 10)
+        self.player.player_control(self.keys, self.level)
+        
+
