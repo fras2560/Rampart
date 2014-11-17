@@ -308,7 +308,6 @@ class Player():
                 elif self.mode == PLACING:
                     if action == LAY_PIECE and self.available_cannons > 0:
                         (x, y) = self.cursor.get()
-                        print(x, y)
                         added = level.add_cannon(x, y, self)
                         if added:
                             self.available_cannons -= 1

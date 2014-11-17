@@ -10,7 +10,7 @@ import logging
 from graph import Graph
 from graph.node import Node
 from rampart.config import NODE_SIZE, CANNON, CANBUILD, BLOCK, TERRAIN_TO_FILE
-from rampart.config import BACKGROUND, CASTLE
+from rampart.config import BACKGROUND, CASTLE, DESTROYED, GRASS
 from graph.terrain import Terrain
 import sys
 
@@ -209,6 +209,19 @@ class Level():
             player.add_cannon(cannon)
         return add
 
+    def destroy_node(self, x, y):
+        '''
+        a method that destroys the node
+        Parameters:
+            x: the x position (int)
+            y: the y position (int)
+        Returns:
+            None
+        '''
+        row = (y) // NODE_SIZE
+        column = (x) // NODE_SIZE
+        self.graph.destroy_node(row, column)
+
     def add_piece(self, player):
         '''
         a method used to add the piece of the player to the level
@@ -275,6 +288,19 @@ class Level():
                 player.add_castle(node)
         return
 
+    def cleanup(self):
+        '''
+        a method that cleanup the level of all destroyed squares
+        Parameters:
+            None
+        Returns:
+            None
+        '''
+        for node in self.graph.iterate():
+            if node.get_state() == DESTROYED:
+                (x, y) = node.get()
+                self.update_node(x, y, GRASS)
+
 from rampart.config import CASTLE_SPOTS
 def castle_spot(row, column):
     for (r,c) in CASTLE_SPOTS:
@@ -283,7 +309,7 @@ def castle_spot(row, column):
 import unittest
 import os
 import pygame
-from rampart.config import WATER
+from rampart.config import WATER, NORMAL
 from rampart.player import Player
 from rampart.piece import Piece
 
@@ -430,7 +456,28 @@ class Test(unittest.TestCase):
         self.assertEqual(added, True)
         added = self.level.add_castle(30, 30, player)
         self.assertEqual(added, False)
-        
-        
+
+    def testCleanup(self):
+        player = Player()
+        self.level.update_node(0, 0, BLOCK, player)
+        cell = self.level.graph.get_node(0, 0)
+        before = cell.get_type()
+        self.level.destroy_node(0, 0)
+        self.level.cleanup()
+        cell = self.level.graph.get_node(0, 0)
+        self.assertNotEqual(cell.get_type(), before)
+        self.assertEqual(cell.get_type(), GRASS)
+        self.assertEqual(cell.get_state(), NORMAL)
+
+    def testDestroyNode(self):
+        player = Player()
+        self.level.update_node(0, 0, BLOCK, player)
+        cell = self.level.graph.get_node(0, 0)
+        before = cell.get_state()
+        self.level.destroy_node(0, 0)
+        cell = self.level.graph.get_node(0, 0)
+        after = cell.get_state()
+        self.assertNotEqual(after, before)
+        self.assertEqual(after, DESTROYED)
 if __name__ == "__main__":
     unittest.main()
