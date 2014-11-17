@@ -160,6 +160,16 @@ class Node(pygame.sprite.Sprite):
         rect[odd].y = self.y
         surface_blit(image[odd], rect[odd])
 
+    def get_state(self):
+        '''
+        a method that gets the state of the node
+        Parameters:
+            None
+        Returns:
+            self.state: the state of the node (int)
+        '''
+        return self.state
+
     def get_type(self):
         '''
         a method that gets type of terrain of the node
@@ -220,6 +230,15 @@ class Node(pygame.sprite.Sprite):
         '''
         return self.player
 
+    def destroy(self):
+        '''
+        a method that sets the node state to destroyed
+        Parameters:
+            None
+        Returns:
+            None
+        '''
+        self.state = DESTROYED
 '''
 -------------------------------------------------------------------------------
 Unittest Imports
