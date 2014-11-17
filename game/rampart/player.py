@@ -62,6 +62,8 @@ class Player():
         self.color = color
         self.controls = {}
         self.available_cannons = 0
+        self.point = pygame.font.SysFont('monospace', 12)
+        self.black = Color().black
 
     def check_castles(self):
         for tower in self.towers:
@@ -140,10 +142,13 @@ class Player():
         elif self.mode == BUILDING:
             self.piece.draw(surface, self.color)
         elif self.mode == PLACING:
-            if self.available_cannons > 0:
-                (x, y) = self.cursor.get()
-                r = (x, y, NODE_SIZE, NODE_SIZE)
-                pygame.draw.rect(surface, self.color.grey, r)
+            (x, y) = self.cursor.get()
+            r = (x, y, NODE_SIZE, NODE_SIZE)
+            pygame.draw.rect(surface, self.color, r, 2)
+            label = self.point.render("%d" % (self.available_cannons),
+                                  2, self.black)
+            (x, y) = self.cursor.get()
+            surface.blit(label, (x, y))
 
     def shoot(self):
         '''
@@ -301,8 +306,9 @@ class Player():
                     elif action == ROTATE_LEFT:
                         self.piece.counter_clockwise_turn()
                 elif self.mode == PLACING:
-                    if self.action == LAY_PIECE and self.available_cannons > 0:
+                    if action == LAY_PIECE and self.available_cannons > 0:
                         (x, y) = self.cursor.get()
+                        print(x, y)
                         added = level.add_cannon(x, y, self)
                         if added:
                             self.available_cannons -= 1
