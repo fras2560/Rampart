@@ -134,7 +134,7 @@ TERRAIN_TO_FILE = {CANNON: [
                            ],
                    WALL: [
                           [I_WALL],
-                          [I_WALL],
+                          [E_GRASS_NORMAL],
                           [I_WALL]
                          ],
                    EXTERIOR: [
