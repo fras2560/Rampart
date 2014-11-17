@@ -11,8 +11,8 @@
 Imports
 -------------------------------------------------------------------------------
 '''
-from rampart.config import BASE, PLAYERCOLORS, BUILDING, SHOOTING
-from rampart.config import BUILDTIME, SHOOTTIME, SIZE, NODE_SIZE
+from rampart.config import BASE, PLAYERCOLORS, BUILDING, SHOOTING, PLACING
+from rampart.config import BUILDTIME, SHOOTTIME, PLACETIME, SIZE, NODE_SIZE
 from rampart.config import LEFT, RIGHT, UP, DOWN
 from rampart.color import Color
 from rampart.player import Player
@@ -115,7 +115,8 @@ class Rampart():
                 None
         '''
         self.clock -= 1
-        self.level.update()
+        if self.mode == BUILDING or self.mode == PLACING:
+            self.level.update()
         for p in self.players:
             p.update()
 
@@ -129,9 +130,9 @@ class Rampart():
         '''
         self.controls()
         if self.play:
+            self.tick()
             if self.clock == 0:
                 self.switch_mode()
-            self.tick()
             self.draw()
             self.heart.tick(10)
         return self.play
@@ -145,9 +146,25 @@ class Rampart():
                 None
         '''
         if self.mode == BUILDING:
+            self.place_mode()
+        elif self.mode == PLACING:
             self.shoot_mode()
         elif self.mode == SHOOTING:
             self.build_mode()
+
+    def place_mode(self):
+        '''
+            a method that chanes the game to place mode
+            Parameters:
+                None
+            Returns:
+                None
+        '''
+        for player in self.players:
+            player.place_mode()
+            player.check_castles()
+        self.clock = PLACETIME
+        self.mode = PLACING
 
     def build_mode(self):
         '''
