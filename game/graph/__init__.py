@@ -202,6 +202,20 @@ class Graph():
                 yes = False
                 break
         return yes
+
+    def destroy_node(self, row, column):
+        '''
+        a method that destroys the node at spot (x, y)
+        Parameters:
+            row: the row position (int)
+            column: the column position (int)
+        Returns:
+            None
+        '''
+        nodes = nx.get_node_attributes(self.graph, 'nodes')
+        nodes[self.get_node_id(row, column)].destroy()
+        return
+
 import unittest
 from graph.node import Node
 from rampart.config import GRASS, TERRAIN_TO_FILE, BACKGROUND, NODE_SIZE
