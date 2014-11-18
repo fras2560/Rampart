@@ -307,6 +307,15 @@ class Cannonball(pygame.sprite.Sprite):
             self.exploding = True
             self.bomb.set(self.end)
         return
+    def get_end(self):
+        '''
+        a method that gets the end position of the node
+        Parameters:
+            None
+        Returns:
+            self.end: the ending point
+        '''
+        return self.end.get()
 
     def past_end(self, a, b, direction):
         '''

@@ -206,7 +206,7 @@ class Player():
             if not self.cannonballs[ball].in_air():
                 delete.append(ball)
         for ball in delete:
-            nodes.append(self.cannonballs[ball].get())
+            nodes.append(self.cannonballs[ball].get_end())
             del self.cannonballs[ball]
         return nodes
 

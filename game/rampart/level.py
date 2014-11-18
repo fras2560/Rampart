@@ -479,5 +479,17 @@ class Test(unittest.TestCase):
         after = cell.get_state()
         self.assertNotEqual(after, before)
         self.assertEqual(after, DESTROYED)
+        # test other node
+        player = Player()
+        self.level.update_node(20, 20, BLOCK, player)
+        cell = self.level.graph.get_node(2, 2)
+        before = cell.get_state()
+        self.level.destroy_node(21, 21)
+        cell = self.level.graph.get_node(2, 2)
+        after = cell.get_state()
+        self.assertNotEqual(after, before)
+        self.assertEqual(after, DESTROYED)
+        
+        
 if __name__ == "__main__":
     unittest.main()

@@ -109,7 +109,7 @@ class Rampart():
     def tick(self):
         '''
             a method that updates the clock of the game
-            Paramters:
+            Parameters:
                 None
             Returns:
                 None
@@ -118,7 +118,22 @@ class Rampart():
         if self.mode == BUILDING or self.mode == PLACING:
             self.level.update()
         for p in self.players:
-            p.update()
+            if self.mode == SHOOTING:
+                balls = p.update()
+                for ball in balls:
+                    (x, y) = ball
+                    self.logger.info("Destroyed (%d, %d)" % (x, y))
+                    self.level.destroy_node(x, y)
+
+    def cleanup(self):
+        '''
+            a method that cleans up the map after shooting has occurred
+            Parameters:
+                None
+            Returns:
+                None
+        '''
+        self.level.cleanup()
 
     def game_tick(self):
         '''
@@ -174,6 +189,7 @@ class Rampart():
             Returns:
                 None
         '''
+        self.level.cleanup()
         for player in self.players:
             player.build_mode()
         self.clock = BUILDTIME
