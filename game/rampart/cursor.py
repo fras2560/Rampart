@@ -69,17 +69,17 @@ class Cursor(pygame.sprite.Sprite):
         Parameters:
             surface: the surface to draw on
         '''
-        point = (int(self.x), int(self.y))
+        point = (int(self.x + 5), int(self.y + 5))
         # draw two circles
         pygame.draw.circle(surface, self.color,
                            point, 5, 1)
         pygame.draw.circle(surface, self.colors.black,
                            point, 2, 1)
         # draw cross hairs
-        point2 = (int(self.x + 5), int(self.y))
-        point3 = (int(self.x - 5), int(self.y))
-        point4 = (int(self.x), int(self.y + 5))
-        point5 = (int(self.x), int(self.y - 5))
+        point2 = (int(self.x), int(self.y))
+        point3 = (int(self.x + 10), int(self.y))
+        point4 = (int(self.x), int(self.y))
+        point5 = (int(self.x), int(self.y + 10))
         
         pygame.draw.line(surface, self.color, point, point2, 1)
         pygame.draw.line(surface, self.color, point, point3, 1)
