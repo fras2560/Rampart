@@ -6,11 +6,12 @@
 @note: Used to create the game
 '''
 from rampart import Rampart
-from rampart.controls import PLAYERONE
+from rampart.controls import PLAYERONE, PLAYERTWO
 import os
 level = os.path.join(os.getcwd(), 'levels', 'LevelOne.txt')
 game = Rampart(2, level)
 game.set_player_controls(1, PLAYERONE)
+game.set_player_controls(2, PLAYERTWO)
 play = True
 while play:
     play = game.game_tick()
