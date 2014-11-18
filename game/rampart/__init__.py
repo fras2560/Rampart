@@ -13,7 +13,7 @@ Imports
 '''
 from rampart.config import BASE, PLAYERCOLORS, BUILDING, SHOOTING, PLACING
 from rampart.config import BUILDTIME, SHOOTTIME, PLACETIME, SIZE, NODE_SIZE
-from rampart.config import LEFT, RIGHT, UP, DOWN
+from rampart.config import LEFT, RIGHT, UP, DOWN, CLEANUP
 from rampart.color import Color
 from rampart.player import Player
 from rampart.level import Level
@@ -133,7 +133,20 @@ class Rampart():
             Returns:
                 None
         '''
+        finish = False
+        while not finish:
+            finish = True
+            for player in self.players:
+                if len(player.cannonballs) > 0:
+                    finish = False
+                balls = player.update()
+                for ball in balls:
+                    (x, y) = ball
+                    self.level.destroy_node(x, y)
+                self.draw()
+                self.heart.tick(10)
         self.level.cleanup()
+        self.build_mode()
 
     def game_tick(self):
         '''
@@ -165,7 +178,7 @@ class Rampart():
         elif self.mode == PLACING:
             self.shoot_mode()
         elif self.mode == SHOOTING:
-            self.build_mode()
+            self.cleanup()
 
     def place_mode(self):
         '''
@@ -189,7 +202,6 @@ class Rampart():
             Returns:
                 None
         '''
-        self.level.cleanup()
         for player in self.players:
             player.build_mode()
         self.clock = BUILDTIME
