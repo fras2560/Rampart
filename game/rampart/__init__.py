@@ -102,8 +102,9 @@ class Rampart():
                 key = pygame.key.get_pressed()
                 keys = key
         if keys is not None:
-            for player in self.players:
-                player.player_control(keys, self.level)
+            if self.mode != CLEANUP:
+                for player in self.players:
+                    player.player_control(keys, self.level)
         return
 
     def tick(self):
@@ -133,20 +134,15 @@ class Rampart():
             Returns:
                 None
         '''
-        finish = False
-        while not finish:
-            finish = True
-            for player in self.players:
-                if len(player.cannonballs) > 0:
-                    finish = False
-                balls = player.update()
-                for ball in balls:
-                    (x, y) = ball
-                    self.level.destroy_node(x, y)
-                self.draw()
-                self.heart.tick(10)
-        self.level.cleanup()
-        self.build_mode()
+        finish = True
+        for player in self.players:
+            if len(player.cannonballs) > 0:
+                finish = False
+            balls = player.update()
+            for ball in balls:
+                (x, y) = ball
+                self.level.destroy_node(x, y)
+        return finish
 
     def game_tick(self):
         '''
@@ -158,9 +154,15 @@ class Rampart():
         '''
         self.controls()
         if self.play:
-            self.tick()
-            if self.clock == 0:
+            if self.mode != CLEANUP:
+                self.tick()
+            if self.clock == 0 and self.mode != CLEANUP:
                 self.switch_mode()
+            elif self.mode == CLEANUP:
+                finished = self.cleanup()
+                if finished:
+                    self.level.cleanup()
+                    self.build_mode()
             self.draw()
             self.heart.tick(10)
         return self.play
@@ -178,7 +180,7 @@ class Rampart():
         elif self.mode == PLACING:
             self.shoot_mode()
         elif self.mode == SHOOTING:
-            self.cleanup()
+            self.mode = CLEANUP
 
     def place_mode(self):
         '''
