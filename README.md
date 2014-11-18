@@ -24,8 +24,9 @@ Install Dependencies
 -----------
 ```sh
     pip install flask
-    *[Pygames Download]
 ```
+* [Pygames Download] - Download there
+
 
 Play the Game
 -----------
