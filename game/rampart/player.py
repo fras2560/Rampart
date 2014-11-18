@@ -65,6 +65,22 @@ class Player():
         self.point = pygame.font.SysFont('monospace', 12)
         self.black = Color().black
 
+    def set_point(self, castle=0):
+        '''
+        a method that sets the initial point of the player equal to one
+        of their castles
+        Parameters:
+            castle: the castle index to set the point to (int)
+        Returns:
+            None
+        '''
+        assert castle < len(self.towers), "Invalid Castle Index"
+        (x, y) = self.towers[castle].get()
+        p = Point()
+        p.set(x, y)
+        self.cursor.set(p)
+        self.piece.translate(x, y)
+
     def check_castles(self):
         for tower in self.towers:
             if not tower.is_painted():

@@ -42,6 +42,8 @@ class Rampart():
         for p_id in range(1, players+1):
             self.players.append(Player(iid=p_id, color=PLAYERCOLORS[p_id - 1]))
             self.level.add_players_castles(self.players[p_id - 1])
+        for p_id in range(1, players+1):
+            self.players[p_id -1].set_point()
         self.build_mode()
         self.clock = BUILDTIME
         self.play = True
