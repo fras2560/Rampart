@@ -89,6 +89,14 @@ BASE = os.path.join(os.path.dirname(os.getcwd()),'levels', 'base.txt')
 BUILDINGBASE = os.path.join(os.path.dirname(os.getcwd()),'levels',
                             'test-building-map.txt')
 CASTLE_SPOTS= [(0, 0), (0, 1), (1, 0), (1,1), (0, 2), (1, 2)]
+
+'''
+Game Sounds
+'''
+CANNON_SOUNDS = ['Cannon.wav', 'Cannon2.wav', 'Cannon3.wav']
+APPLAUSE = 'WellDone.wav'
+END_TURN = 'EndTurn.wav'
+WELCOME = 'Welcome.wav'
 '''
 Node Types, Constants, and Indexes
 '''
