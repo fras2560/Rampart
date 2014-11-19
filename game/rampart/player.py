@@ -296,12 +296,13 @@ class Player():
         '''
         self.controls = controls
 
-    def player_control(self, keys, level):
+    def player_control(self, keys, level, sounds=None):
         '''
         a method that takes the key presses and determines the player move
         Parameters:
-            keys: the keys pressed
-            level: the game level
+            keys: the keys pressed (list)
+            level: the game level (level)
+            sounds: the optional sounds class (Sound)
         Returns:
             None
         '''
@@ -309,7 +310,9 @@ class Player():
             if keys[button]:
                 if self.mode == SHOOTING:
                     if action == SHOOT:
-                        self.shoot()
+                        shot = self.shoot()
+                        if shot and sounds is not None:
+                            sounds.cannon() 
                 elif self.mode == BUILDING:
                     if action == LAY_PIECE:
                         added = level.add_piece(self)
@@ -575,9 +578,10 @@ class PlayerControlTest(unittest.TestCase):
         self.keys[pygame.K_w] = 1
         self.player.player_control(self.keys, self.level)
         self.assertEqual({}, self.player.cannonballs)
-        castle = Node(x=0, y=0, terrain=CANNON,
+        cannon = Node(x=0, y=0, terrain=CANNON,
                       player=1, images=self.terrain)
-        self.player.add_cannon(castle)
+        cannon.unpaint()
+        self.player.add_cannon(cannon)
         self.player.player_control(self.keys, self.level)
         expect = {}
         expect[(0, 0)] = self.player.cannonballs[(0, 0)]

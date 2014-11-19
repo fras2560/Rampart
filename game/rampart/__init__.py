@@ -17,6 +17,7 @@ from rampart.config import LEFT, RIGHT, UP, DOWN, CLEANUP
 from rampart.color import Color
 from rampart.player import Player
 from rampart.level import Level
+from rampart.sounds import Sounds
 import pygame
 import logging
 
@@ -27,10 +28,14 @@ class Rampart():
             players: the number of players (int)
             level: the level to player (filepath)
         '''
+
         logging.basicConfig(level=logging.INFO,
                             format='%(asctime)s %(message)s')
         self.logger = logging.getLogger(__name__)
+        pygame.mixer.pre_init(44100, -16, 2, 2048)
         pygame.init()
+        self.sounds = Sounds()
+        self.sounds.welcome()
         self.screen = pygame.display.set_mode(SIZE)
         pygame.display.set_caption("Rampart")
         pygame.key.set_repeat(1, 5)
@@ -106,7 +111,7 @@ class Rampart():
         if keys is not None:
             if self.mode != CLEANUP:
                 for player in self.players:
-                    player.player_control(keys, self.level)
+                    player.player_control(keys, self.level, self.sounds)
         return
 
     def tick(self):
@@ -183,6 +188,7 @@ class Rampart():
             self.shoot_mode()
         elif self.mode == SHOOTING:
             self.mode = CLEANUP
+            self.sounds.end_turn()
 
     def place_mode(self):
         '''
