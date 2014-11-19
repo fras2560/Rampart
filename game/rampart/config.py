@@ -93,11 +93,11 @@ CASTLE_SPOTS= [(0, 0), (0, 1), (1, 0), (1,1), (0, 2), (1, 2)]
 '''
 Game Sounds
 '''
-EXPLOSION_SOUNDS = ['Explosion1.wav','Explosion1.wav',
-                     'Explosion1.wav', 'Explosion1.wav'
+EXPLOSION_SOUNDS = ['Explosion.wav','Explosion2.wav',
+                     'Explosion3.wav', 'Explosion4.wav'
                 ]
 CANNON_SOUNDS = ['Cannon.wav', 'Cannon2.wav', 'Cannon3.wav']
-APPLAUSE = 'WellDone.wav'
+APPLAUSE = 'Applause.wav'
 END_TURN = 'EndTurn.wav'
 WELCOME = 'Welcome.wav'
 '''

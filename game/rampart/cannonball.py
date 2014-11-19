@@ -227,7 +227,7 @@ will write tests once decide on gravity constant
 '''
 
 class Cannonball(pygame.sprite.Sprite):
-    def __init__(self):
+    def __init__(self, sounds=None):
         '''
         equation: the equation of the cannon ball path
         _shoot: a boolean telling whether the cannon ball
@@ -248,6 +248,7 @@ class Cannonball(pygame.sprite.Sprite):
         self.color = Color()
         self.bomb = Explosion()
         self.exploding = False
+        self.sounds = sounds
 
     def reset(self):
         '''
@@ -282,7 +283,7 @@ class Cannonball(pygame.sprite.Sprite):
         (x,y) = p1.get()
         self.x = x
         self.y = y
-        
+
     def in_air(self):
         '''
         a method that checks if the cannon ball is  in the air or not
@@ -305,6 +306,8 @@ class Cannonball(pygame.sprite.Sprite):
         self.position = self.equation.get()
         if self.equation.done:
             self.exploding = True
+            if self.sounds is not None:
+                self.sounds.explosion()
             self.bomb.set(self.end)
         return
     def get_end(self):

@@ -10,7 +10,7 @@ import helper
 from color import Color
 from rampart.config import EXPLOSIONS
 class Explosion(pygame.sprite.Sprite):
-    def __init__(self):
+    def __init__(self, sounds=None):
         pygame.sprite.Sprite.__init__(self)
         self.images = []
         self.rects = []

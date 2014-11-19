@@ -166,7 +166,7 @@ class Player():
             (x, y) = self.cursor.get()
             surface.blit(label, (x, y))
 
-    def shoot(self):
+    def shoot(self, sounds=None):
         '''
         a method for the player to shoot a cannonball at the specific position
         Parameters:
@@ -179,7 +179,7 @@ class Player():
             for cannon in self.guns:
                 position = cannon.get()
                 if not cannon.is_painted() and position not in self.cannonballs:
-                    ball = Cannonball()
+                    ball = Cannonball(sounds)
                     p1 = Point()
                     p1.set(position[0], position[1])
                     p2 = Point()
@@ -310,7 +310,7 @@ class Player():
             if keys[button]:
                 if self.mode == SHOOTING:
                     if action == SHOOT:
-                        shot = self.shoot()
+                        shot = self.shoot(sounds)
                         if shot and sounds is not None:
                             sounds.cannon() 
                 elif self.mode == BUILDING:

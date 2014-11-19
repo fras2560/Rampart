@@ -131,7 +131,6 @@ class Rampart():
                 for ball in balls:
                     (x, y) = ball
                     self.logger.info("Destroyed (%d, %d)" % (x, y))
-                    self.sounds.explosion()
                     self.level.destroy_node(x, y)
 
     def cleanup(self):
