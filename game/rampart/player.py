@@ -164,7 +164,7 @@ class Player():
             label = self.point.render("%d" % (self.available_cannons),
                                   2, self.black)
             (x, y) = self.cursor.get()
-            surface.blit(label, (x, y))
+            surface.blit(label, (x + 2, y - 1))
 
     def shoot(self, sounds=None):
         '''
