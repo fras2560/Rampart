@@ -18,6 +18,7 @@ from rampart.color import Color
 from rampart.player import Player
 from rampart.level import Level
 from rampart.sounds import Sounds
+from time import sleep
 import pygame
 import logging
 
@@ -43,6 +44,8 @@ class Rampart():
         self.point = pygame.font.SysFont('monospace', 18)
         self.color = Color()
         self.players = []
+        self.heart = pygame.time.Clock()
+        self.welcome()
         self.level = Level(level, logger=self.logger)
         for p_id in range(1, players+1):
             self.players.append(Player(iid=p_id, color=PLAYERCOLORS[p_id - 1]))
@@ -52,7 +55,21 @@ class Rampart():
         self.build_mode()
         self.clock = BUILDTIME
         self.play = True
-        self.heart = pygame.time.Clock()
+        
+
+    def welcome(self):
+        '''
+            a method that display a welcome to the user
+            Parameters:
+                None
+            Returns:
+                None
+        '''
+        label = self.header.render("Welcome to Rampart", 2, self.color.red)
+        self.screen.fill(self.color.white)
+        self.screen.blit(label, (20, SIZE[1] // 2))
+        pygame.display.flip()
+        sleep(1)
 
     def display_clock(self):
         '''
@@ -64,7 +81,7 @@ class Rampart():
         '''
         label = self.point.render("Time: %d" % (self.clock //10),
                                   2, self.color.black)
-        self.screen.blit(label,(SIZE[0] // 2, 2 * NODE_SIZE))
+        self.screen.blit(label, (SIZE[0] // 2, 2 * NODE_SIZE))
 
     def draw(self):
         '''
