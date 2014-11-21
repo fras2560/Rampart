@@ -139,6 +139,30 @@ class Piece():
         self.points.append( [[-NODE_SIZE],[-NODE_SIZE]])
         self.points.append([[NODE_SIZE],[0]])
 
+    def _one_piece(self):
+        '''
+        a method to create a one piece
+        Parameters:
+            None
+        Returns:
+            None
+        '''
+        self.points.append( [[0], [0]])
+
+    def _cross_piece(self):
+        '''
+        a method to create a cross piece
+        Parameters:
+            None
+        Returns:
+            None
+        '''
+        self.points.append( [[0], [0]])
+        self.points.append( [[-NODE_SIZE], [0]])
+        self.points.append( [[NODE_SIZE], [0]])
+        self.points.append( [[0], [-NODE_SIZE]])
+        self.points.append( [[0], [NODE_SIZE]])
+        
     def create_piece(self):
         '''
         a method used to create a random piece
@@ -147,22 +171,19 @@ class Piece():
         Returns:
             None
         '''
-        piece = randint(1,7)
+        pieces_functions = [
+                            self._I_piece,
+                            self._J_piece,
+                            self._L_piece,
+                            self._O_piece,
+                            self._one_piece,
+                            self._S_piece,
+                            self._T_piece,
+                            self._Z_piece,
+                            self._cross_piece]
+        piece = randint(0, len(pieces_functions) - 1)
         self.reset()
-        if piece == 1:
-            self._I_piece()
-        elif piece == 2:
-            self._J_piece()
-        elif piece == 3:
-            self._L_piece()
-        elif piece == 4:
-            self._O_piece()
-        elif piece == 5:
-            self._S_piece()
-        elif piece == 6:
-            self._T_piece()
-        elif piece == 7:
-            self._Z_piece()
+        pieces_functions[piece]()
 
     def rotate(self, angle):
         '''
